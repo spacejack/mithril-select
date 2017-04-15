@@ -1,6 +1,6 @@
 # Mithril Custom Select Component
 
-A custom select widget component for [Mithril](https://mithril.js.org/) 1.1. Built to mimick native browser select behaviour (if not looks) as closely as possible, including acessibility and keyboard features.
+A custom select widget component for [Mithril](https://mithril.js.org/) 1.1. Built to mimic native browser select behaviour (if not looks) as closely as possible, including acessibility and keyboard features. The minimal CSS included can be overridden by your own styles.
 
 Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
@@ -10,11 +10,13 @@ Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
 If you're using a sass compiler, you can add:
 
-    @import 'node_modules/mithril-select/index';
+```scss
+@import 'node_modules/mithril-select/index';
+```
 
-Otherwise you can copy that `index.css` file to your project and add it to your html page.
+to one of your sass files. Otherwise you can copy that `index.css` file to your project and add it to your html page.
 
-Note that currently this component does not support changing options between redraws.
+Note: Currently this component does not support changing select options between redraws.
 
 ## Example use:
 
