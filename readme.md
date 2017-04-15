@@ -10,9 +10,9 @@ Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
 If you're using a sass compiler, you can add:
 
-    @include 'node_modules/mithril-select/index.css'
+    @import 'node_modules/mithril-select/index';
 
-Otherwise you can copy that css file to your project and add it to your html page.
+Otherwise you can copy that `index.css` file to your project and add it to your html page.
 
 Note that currently this component does not support changing options between redraws.
 
