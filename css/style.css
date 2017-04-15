@@ -1,0 +1,54 @@
+body, td, th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+}
+
+/* Class applied to custom select - in addition to its own internal styles */
+.app-select {
+	margin-right: 1em;
+}
+
+/* Sport select */
+.sport-select {
+	margin-right: 1em;
+}
+
+/* add some padding */
+.sport-select .mithril-select-head, .sport-select .mithril-select-option {
+	padding: 0.2em 0.4em;
+}
+
+/* styles for custom component contents */
+.sport-select .sport-image {
+	width: 2em;
+	height: 2em;
+	margin-right: 0.5em;
+	margin-bottom: -0.35em;
+}
+
+.sport-select .sport-text {
+	font-family: Impact,sans-serif;
+	font-size: 1.5em;
+}
+
+/* Language select */
+.lang-select {
+	margin-right: 1em;
+}
+
+/* Use some padding */
+.lang-select .mithril-select-head, .lang-select .mithril-select-option {
+	padding: 0.125em 0.25em;
+}
+
+/* Show down triangle in select head */
+.lang-select .mithril-select-head::after {
+	font-size: 0.8em;
+	content: " \25BC";
+}
+
+/* max height and scrolling */
+.lang-select .mithril-select-options {
+	max-height: 10em;
+	overflow-y: auto;
+}
