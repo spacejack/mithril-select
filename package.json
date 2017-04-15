@@ -1,0 +1,40 @@
+{
+  "name": "mithril-select",
+  "version": "0.1.0",
+  "description": "Mithril custom select component",
+  "keywords": [
+    "mithril",
+    "select",
+    "dropdown"
+  ],
+  "author": "Mike Linkovich",
+  "license": "MIT",
+  "repository": "https://github.com/spacejack/mithril-select",
+  "main": "index.js",
+  "scripts": {
+    "build-lib": "tsc -p src",
+    "serve-ex": "http-server -p 3000 example/public",
+    "compile-ex": "browserify --debug example/src/main.ts -p [ tsify --project example/src/tsconfig.json ] -o example/public/js/app.js",
+    "watch-ex": "cp index.css example/public/css/mithril-select.css && watchify -v --debug example/src/main.ts -p [ tsify --project example/src/tsconfig.json ] -o example/public/js/app.js",
+    "build-ex": "cp index.css example/public/css/mithril-select.css && browserify example/src/main.ts -p [ tsify --project example/src/tsconfig.json ] | uglifyjs -cm -o example/public/js/app.js",
+    "build-es2015": "tsc src/index.ts --target ES2015",
+    "clean-ex": "rm -f example/public/js/app.js",
+    "clean-lib": "rm -f index.js index.d.ts",
+    "clean-es2015": "rm -f src/index.js",
+    "build": "npm-run-all build-lib build-ex",
+    "clean": "npm-run-all clean-lib clean-ex clean-es2015",
+    "start": "npm-run-all -p watch-ex serve-ex"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/mithril": "^1.1.0",
+    "http-server": "^0.9.0",
+    "mithril": "^1.1.1",
+    "npm-run-all": "^4.0.2",
+    "tsify": "^3.0.1",
+    "tslint": "^5.1.0",
+    "typescript": "^2.2.2",
+    "uglify-js": "^2.8.22",
+    "watchify": "^3.9.0"
+  }
+}

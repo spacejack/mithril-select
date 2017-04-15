@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["dom", "es2015"],
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "noLib": false,
+    "declaration": true,
+    "sourceMap": false,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "outDir": ".."
+  },
+  "files": ["index.ts"],
+  "exclude": ["node_modules", "../node_modules"],
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": {
+    "rewriteTsconfig": false
+  }
+}

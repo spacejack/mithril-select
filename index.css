@@ -1,0 +1,45 @@
+/* Styles for mithril-select component */
+.mithril-select {
+	display: inline-block;
+}
+
+.mithril-select-head {
+	cursor: default;
+	-webkit-user-select: none;
+	user-select: none;
+	border: #CCC 1px solid;
+	box-sizing: border-box;
+}
+
+.mithril-select-body {
+	display: none;
+	position: relative;
+	width: 0;
+	height: 0;
+}
+.mithril-select-body-open {
+	display: block;
+}
+
+.mithril-select-options {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	left: 0;
+	top: -1px;
+	border: #CCC 1px solid;
+	background: #FFF;
+}
+
+.mithril-select-option {
+	margin: 0;
+	white-space: nowrap;
+	cursor: default;
+	-webkit-user-select: none;
+	user-select: none;
+}
+.mithril-select-option:hover {
+	color: #FFF;
+	background: #428BCA;
+}

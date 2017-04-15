@@ -2,7 +2,7 @@
 
 A custom select widget component for [Mithril](https://mithril.js.org/) 1.1. Built to mimick native browser select behaviour (if not looks) as closely as possible, including acessibility and keyboard features.
 
-Try a [live demo here](http://www.spacejack.ca/mithril-select/).
+Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
 ## Install:
 
