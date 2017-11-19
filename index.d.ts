@@ -1,12 +1,12 @@
 /// <reference types="mithril" />
-import * as m from 'mithril';
+import { FactoryComponent, ComponentTypes, Vnode } from 'mithril';
 /** Represents a single option in a select */
 export interface Option {
     /** Unique value that identifies this option. */
     value: any;
     /** Content to display for this option. Can be a string or component.
         If this property is omitted then the value property will be used for display. */
-    content?: string | m.ComponentTypes<any, any>;
+    content?: string | ComponentTypes<any, any>;
     /** If content is a mithril component, this attrs object will be supplied to it. */
     attrs?: any;
 }
@@ -16,7 +16,7 @@ export interface Attrs {
     options: Option[];
     /** Optional prompt content to display until user selects an option.
         If this is omitted, the first option content will be displayed. */
-    promptContent?: string | m.Vnode<any, any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>;
+    promptContent?: string | Vnode<any, any> | Vnode<any, any>[] | ComponentTypes<any, any>;
     /** If promptContent is a mithril component, this attrs object will be supplied to it. */
     promptAttrs?: any;
     /** Optional value to use for element id attribute. */
@@ -32,5 +32,8 @@ export interface Attrs {
     /** Callback that will be passed the value of the selected option. */
     onchange?(value: any): void;
 }
-declare const _default: m.FactoryComponent<Attrs>;
-export default _default;
+/**
+ * mithril-select Component
+ */
+declare const mithrilSelect: FactoryComponent<Attrs>;
+export default mithrilSelect;

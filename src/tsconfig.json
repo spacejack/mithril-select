@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "umd",
     "lib": ["dom", "es2015"],
     "strict": true,
     "suppressImplicitAnyIndexErrors": true,

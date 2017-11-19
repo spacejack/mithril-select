@@ -1,4 +1,10 @@
-import * as m from 'mithril'
+// Import types only
+import {Static, FactoryComponent, ComponentTypes, Vnode} from 'mithril'
+declare function require(moduleName: string): any
+// Script or module?
+const m: Static = typeof window === 'object' && !!window['m']
+	? window['m']
+	: require('mithril')
 
 /** Represents a single option in a select */
 export interface Option {
@@ -6,7 +12,7 @@ export interface Option {
 	value: any
 	/** Content to display for this option. Can be a string or component.
 	    If this property is omitted then the value property will be used for display. */
-	content?: string | m.ComponentTypes<any,any>
+	content?: string | ComponentTypes<any,any>
 	/** If content is a mithril component, this attrs object will be supplied to it. */
 	attrs?: any
 }
@@ -17,7 +23,7 @@ export interface Attrs {
 	options: Option[]
 	/** Optional prompt content to display until user selects an option.
 	    If this is omitted, the first option content will be displayed. */
-	promptContent?: string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>
+	promptContent?: string | Vnode<any,any> | Vnode<any,any>[] | ComponentTypes<any,any>
 	/** If promptContent is a mithril component, this attrs object will be supplied to it. */
 	promptAttrs?: any
 	/** Optional value to use for element id attribute. */
@@ -37,7 +43,9 @@ export interface Attrs {
 /**
  * mithril-select Component
  */
-export default (function mithrilSelect ({attrs: {defaultValue, promptContent, options}}) {
+const mithrilSelect: FactoryComponent<Attrs> = function(
+	{attrs: {defaultValue, promptContent, options}}
+) {
 	let curValue: any = undefined
 	let isOpen = false
 	let isFocused = false
@@ -262,18 +270,17 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 			)
 		}
 	}
-}) as m.FactoryComponent<Attrs>
-
+}
 
 /** Render content of the head or an option */
 function renderContent (
-	content?: null | undefined | string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>,
+	content?: null | undefined | string | Vnode<any,any> | Vnode<any,any>[] | ComponentTypes<any,any>,
 	attrs?: any
 ): any {
 	// What type is content...
 	if (content && (typeof content === 'function' || typeof (content as any)['view'] === 'function')) {
 		// Assume component - turn into vnode
-		return m(content as m.ComponentTypes<any,any>, attrs)
+		return m(content as ComponentTypes<any,any>, attrs)
 	}
 	return content
 }
@@ -309,4 +316,11 @@ function findOptionIndex (options: Option[], value: any) {
 		if (options[i].value === value) return i
 	}
 	return -1
+}
+
+export default mithrilSelect
+
+if (typeof window === 'object' && window['m'] === m) {
+	// Add global to window if used as a script
+	window['mithrilSelect'] = mithrilSelect
 }
