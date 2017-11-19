@@ -82,6 +82,8 @@ interface Attrs {
   promptAttrs?: any
   /** Optional value to use for element id attribute. */
   id?: string
+  /** Optional name of hidden input for form. If none supplied, no hidden input. */
+  name?: string
   /** Optional label id to use for aria-labelledby attribute. */
   labelId?: string
   /** Value of option that will be selected on creation. Otherwise will be 1st option. */

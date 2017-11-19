@@ -16,11 +16,13 @@ exports.default = (function mithrilSelect(_a) {
     }
     if (defaultValue !== undefined) {
         var o = findOption(options, defaultValue);
-        if (!o) {
-            console.warn("defaultValue (" + defaultValue + ") does not exist in supplied MSelect Options.");
-            return;
+        if (o) {
+            curValue = defaultValue;
         }
-        curValue = defaultValue;
+        else {
+            console.warn("defaultValue (" + defaultValue + ") does not exist in supplied MSelect Options.");
+            defaultValue = undefined;
+        }
     }
     /** Handle event when child element is focused */
     function onFocus(e) {
@@ -89,7 +91,7 @@ exports.default = (function mithrilSelect(_a) {
             window.removeEventListener('blur', onBlur, true);
         },
         view: function (_a) {
-            var _b = _a.attrs, id = _b.id, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, labelId = _b.labelId, options = _b.options, onchange = _b.onchange, klass = _b.class;
+            var _b = _a.attrs, id = _b.id, name = _b.name, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, labelId = _b.labelId, options = _b.options, onchange = _b.onchange, klass = _b.class;
             var curOpt = findOption(options, curValue);
             if (!curOpt) {
                 if (options.length > 0 && !promptContent) {
@@ -105,12 +107,14 @@ exports.default = (function mithrilSelect(_a) {
                 id: id,
                 tabIndex: '0',
                 onclick: function (e) {
+                    e.stopPropagation();
                     if (!isOpen)
                         e.preventDefault();
                     toggle(options);
                 },
-                onkeyup: function (e) {
+                onkeydown: function (e) {
                     if (e.keyCode === 32) {
+                        e.preventDefault();
                         toggle(options);
                     }
                     else if (e.keyCode === 27) {
@@ -159,6 +163,7 @@ exports.default = (function mithrilSelect(_a) {
                     'aria-role': 'option',
                     tabIndex: '-1',
                     onclick: function (e) {
+                        e.stopPropagation();
                         curValue = o.value;
                         isFocused = false;
                         close();
@@ -207,7 +212,7 @@ exports.default = (function mithrilSelect(_a) {
                         }
                     }
                 }, renderContent(o.content, o.attrs));
-            }))));
+            }))), !!name && m('input', { name: name, type: 'hidden', value: curValue }));
         }
     };
 });

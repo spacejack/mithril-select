@@ -22,6 +22,8 @@ export interface Attrs {
 	promptAttrs?: any
 	/** Optional value to use for element id attribute. */
 	id?: string
+	/** Optional name of hidden input for form. If none supplied, no hidden input. */
+	name?: string
 	/** Optional label id to use for aria-labelledby attribute. */
 	labelId?: string
 	/** Value of option that will be selected on creation. Otherwise will be 1st option. */
@@ -47,11 +49,12 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 	}
 	if (defaultValue !== undefined) {
 		const o = findOption(options, defaultValue)
-		if (!o) {
+		if (o) {
+			curValue = defaultValue
+		} else {
 			console.warn(`defaultValue (${defaultValue}) does not exist in supplied MSelect Options.`)
-			return
+			defaultValue = undefined
 		}
-		curValue = defaultValue
 	}
 
 	/** Handle event when child element is focused */
@@ -125,7 +128,8 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 		},
 
 		view ({attrs: {
-			id, promptContent, promptAttrs, labelId, options, onchange, class: klass
+			id, name, promptContent, promptAttrs, labelId,
+			options, onchange, class: klass
 		}}) {
 			let curOpt = findOption(options, curValue)
 			if (!curOpt) {
@@ -145,11 +149,13 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 						id: id,
 						tabIndex: '0',
 						onclick: (e: MouseEvent) => {
+							e.stopPropagation()
 							if (!isOpen) e.preventDefault()
 							toggle(options)
 						},
-						onkeyup: (e: KeyboardEvent) => {
+						onkeydown: (e: KeyboardEvent) => {
 							if (e.keyCode === 32) {
+								e.preventDefault()
 								toggle(options)
 							} else if (e.keyCode === 27) {
 								if (isOpen) {
@@ -201,6 +207,7 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 									'aria-role': 'option',
 									tabIndex: '-1',
 									onclick: (e: Event) => {
+										e.stopPropagation()
 										curValue = o.value
 										isFocused = false
 										close()
@@ -250,7 +257,8 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 							)
 						)
 					)
-				)
+				),
+				!!name && m('input', {name, type: 'hidden', value: curValue})
 			)
 		}
 	}
@@ -263,7 +271,7 @@ function renderContent (
 	attrs?: any
 ): any {
 	// What type is content...
-	if (content && (typeof content === 'function' || typeof content['view'] === 'function')) {
+	if (content && (typeof content === 'function' || typeof (content as any)['view'] === 'function')) {
 		// Assume component - turn into vnode
 		return m(content as m.ComponentTypes<any,any>, attrs)
 	}

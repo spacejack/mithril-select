@@ -1,6 +1,6 @@
 {
   "name": "mithril-select",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mithril custom select component",
   "keywords": [
     "mithril",
@@ -21,20 +21,20 @@
     "clean-ex": "rm -f example/public/js/app.js",
     "clean-lib": "rm -f index.js index.d.ts",
     "clean-es2015": "rm -f src/index.js",
-    "build": "npm-run-all build-lib build-ex",
-    "clean": "npm-run-all clean-lib clean-ex clean-es2015",
-    "start": "npm-run-all -p watch-ex serve-ex"
+    "build": "run-s build-lib build-ex",
+    "clean": "run-s clean-lib clean-ex clean-es2015",
+    "start": "run-p watch-ex serve-ex"
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/mithril": "^1.1.0",
-    "http-server": "^0.9.0",
-    "mithril": "^1.1.1",
-    "npm-run-all": "^4.0.2",
-    "tsify": "^3.0.1",
-    "tslint": "^5.1.0",
-    "typescript": "^2.2.2",
-    "uglify-js": "^2.8.22",
+    "@types/mithril": "^1.1.12",
+    "http-server": "^0.10.0",
+    "mithril": "^1.1.5",
+    "npm-run-all": "^4.1.2",
+    "tsify": "^3.0.3",
+    "tslint": "^4.5.1",
+    "typescript": "^2.6.1",
+    "uglify-js": "^3.1.10",
     "watchify": "^3.9.0"
   }
 }
