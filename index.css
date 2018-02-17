@@ -5,6 +5,7 @@
 
 .mithril-select-head {
 	cursor: default;
+	-ms-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
 	border: #CCC 1px solid;
@@ -36,6 +37,7 @@
 	margin: 0;
 	white-space: nowrap;
 	cursor: default;
+	-ms-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
 }

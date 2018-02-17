@@ -77,89 +77,93 @@ interface State {
 }
 
 /** Demo component */
-export default {
-	country: "",
-	colour: "",
-	sport: "",
-	language: "",
-	native: "",
+const demoComponent: m.FactoryComponent = function() {
+	let country = ""
+	let colour = ""
+	let sport = ""
+	let language = ""
+	let native = ""
 
-	view() {
-		return [
-			m('p', "Country: " + this.country),
-			m('p', "Colour: " + this.colour),
-			m('p', "Sport: " + this.sport),
-			m('p', "Language: " + this.language),
-			m('p', "Native select: ", this.native),
-			m(mSelect,
-				{
-					// This select prompts user with text content until an option is picked
-					options: countries,
-					class: 'app-select',
-					onchange: (val: string) => {
-						this.country = val != null
-							? countries.find(c => c.value === val)!.content
-							: ""
+	return {
+		view() {
+			return [
+				m('p', "Country: " + country),
+				m('p', "Colour: " + colour),
+				m('p', "Sport: " + sport),
+				m('p', "Language: " + language),
+				m('p', "Native select: ", native),
+				m(mSelect,
+					{
+						// This select prompts user with text content until an option is picked
+						options: countries,
+						class: 'demo-select',
+						onchange: (val: string) => {
+							country = val != null
+								? countries.find(c => c.value === val)!.content
+								: ""
+						}
 					}
-				}
-			),
-			// Example label for colour select
-			m('label',
-				{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
-				"Colour:"
-			),
-			m(mSelect,
-				{
-					// This select defaults to the first option
-					options: colours,
-					id: 'colour-select',
-					class: 'app-select',
-					labelId: 'colour-label',
-					onchange: (val: string) => {
-						this.colour = colours.find(c => c.value === val)!.content
+				),
+				// Example label for colour select
+				m('label',
+					{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
+					"Colour:"
+				),
+				m(mSelect,
+					{
+						// This select defaults to the first option
+						options: colours,
+						id: 'colour-select',
+						class: 'demo-select',
+						labelId: 'colour-label',
+						onchange: (val: string) => {
+							colour = colours.find(c => c.value === val)!.content
+						}
 					}
-				}
-			),
-			m(mSelect,
-				{
-					// This select's prompt is a vnode array.
-					// It disappears as an option once the user selects something.
-					promptContent: [
-						m('img.sport-image', {src: 'img/question.png'}),
-						m('span.sport-text', "Sport")
-					],
-					// This select's options are components containing images for options
-					options: sports,
-					class: 'sport-select',
-					onchange: (val: number) => {
-						this.sport = sports.find(c => c.value === val)!.attrs.text
+				),
+				m(mSelect,
+					{
+						// This select's prompt is a vnode array.
+						// It disappears as an option once the user selects something.
+						promptContent: [
+							m('img.sport-image', {src: 'img/question.png'}),
+							m('span.sport-text', "Sport")
+						],
+						// This select's options are components containing images for options
+						options: sports,
+						class: 'sport-select',
+						onchange: (val: number) => {
+							sport = sports.find(c => c.value === val)!.attrs.text
+						}
 					}
-				}
-			),
-			m(mSelect,
-				{
-					// This select uses a custom style for down arrow in head
-					options: languages,
-					class: 'lang-select',
-					onchange: (val: string) => {
-						this.language = val != null
-							? languages.find(c => c.value === val)!.content
-							: ""
+				),
+				m(mSelect,
+					{
+						// This select uses a custom style for down arrow in head
+						options: languages,
+						class: 'lang-select',
+						onchange: (val: string) => {
+							language = val != null
+								? languages.find(c => c.value === val)!.content
+								: ""
+						}
 					}
-				}
-			),
-			m('select',
-				{
-					onchange: m.withAttr('value', (val: string) => {
-						this.native = val !== "" ?
-							nativeOpts.find(n => n.value === val)!.content
-							: ""
-					})
-				},
-				nativeOpts.map(o =>
-					m('option', {value: o.value}, o.content)
+				),
+				m('select',
+					{
+						onchange: m.withAttr('value', (val: string) => {
+							native = val !== "" ?
+								nativeOpts.find(n => n.value === val)!.content
+								: ""
+						})
+					},
+					nativeOpts.map(o =>
+						m('option', {value: o.value}, o.content)
+					)
 				)
-			)
-		]
+			]
+		}
 	}
-} as m.Comp<{},State>
+}
+
+export default demoComponent

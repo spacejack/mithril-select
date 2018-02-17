@@ -12,4 +12,4 @@ export default {
 			m('span.sport-text', text)
 		]
 	}
-} as m.Component<Attrs,{}>
+} as m.Component<Attrs>
