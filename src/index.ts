@@ -129,8 +129,9 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 
 		view ({attrs: {
 			id, name, promptContent, promptAttrs, labelId,
-			options, onchange, class: klass
+			options: updatedOptions, onchange, class: klass
 		}}) {
+			options = updatedOptions
 			let curOpt = findOption(options, curValue)
 			if (!curOpt) {
 				if (options.length > 0 && !promptContent) {

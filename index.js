@@ -91,7 +91,8 @@ exports.default = (function mithrilSelect(_a) {
             window.removeEventListener('blur', onBlur, true);
         },
         view: function (_a) {
-            var _b = _a.attrs, id = _b.id, name = _b.name, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, labelId = _b.labelId, options = _b.options, onchange = _b.onchange, klass = _b.class;
+            var _b = _a.attrs, id = _b.id, name = _b.name, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, labelId = _b.labelId, updatedOptions = _b.options, onchange = _b.onchange, klass = _b.class;
+            options = updatedOptions;
             var curOpt = findOption(options, curValue);
             if (!curOpt) {
                 if (options.length > 0 && !promptContent) {
