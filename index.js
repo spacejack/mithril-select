@@ -4,8 +4,8 @@ var m = require("mithril");
 /**
  * mithril-select Component
  */
-exports.default = (function mithrilSelect(_a) {
-    var _b = _a.attrs, defaultValue = _b.defaultValue, promptContent = _b.promptContent, options = _b.options;
+var mithrilSelect = function mithrilSelect(_a) {
+    var _b = _a.attrs, initialValue = _b.initialValue, defaultValue = _b.defaultValue, firstValue = _b.value, promptContent = _b.promptContent, options = _b.options;
     var curValue = undefined;
     var isOpen = false;
     var isFocused = false;
@@ -14,14 +14,25 @@ exports.default = (function mithrilSelect(_a) {
     if (!promptContent && options && options.length > 0) {
         curValue = options[0].value;
     }
-    if (defaultValue !== undefined) {
-        var o = findOption(options, defaultValue);
-        if (o) {
-            curValue = defaultValue;
+    if (defaultValue !== undefined && initialValue === undefined) {
+        console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.');
+        initialValue = defaultValue;
+    }
+    if (firstValue !== undefined) {
+        // If a `value` attr was supplied it overrides/is used as initialValue
+        if (findOption(options, firstValue)) {
+            initialValue = firstValue;
         }
         else {
-            console.warn("defaultValue (" + defaultValue + ") does not exist in supplied MSelect Options.");
-            defaultValue = undefined;
+            console.warn("mithril-select: value (" + firstValue + ") does not exist in supplied options.");
+        }
+    }
+    if (initialValue !== undefined) {
+        if (findOption(options, initialValue)) {
+            curValue = initialValue;
+        }
+        else {
+            console.warn("mithril-select: initialValue (" + initialValue + ") does not exist in supplied options.");
         }
     }
     /** Handle event when child element is focused */
@@ -61,13 +72,7 @@ exports.default = (function mithrilSelect(_a) {
         // (like a native browser select.)
         // Then we want to allow the arrow keys to move up & down.
         if (options && options.length > 0) {
-            var i = 0;
-            if (curValue !== undefined) {
-                i = findOptionIndex(options, curValue);
-            }
-            else {
-                i = 0;
-            }
+            var i = curValue !== undefined ? Math.max(0, findOptionIndex(options, curValue)) : 0;
             var elOpt_1 = rootElement.childNodes[1].childNodes[0].childNodes[i];
             // Must delay a frame before focusing
             requestAnimationFrame(function () {
@@ -78,6 +83,17 @@ exports.default = (function mithrilSelect(_a) {
     function close() {
         isOpen = false;
     }
+    function nextOption(dir, onchange) {
+        if (!options || options.length < 1)
+            return;
+        var index = 0;
+        if (curValue !== undefined) {
+            index = findOptionIndex(options, curValue);
+            index = (index >= 0) ? pmod(index + dir, options.length) : 0;
+        }
+        curValue = options[index].value;
+        onchange && onchange(curValue);
+    }
     // Return object with component hooks
     return {
         oncreate: function (_a) {
@@ -86,17 +102,26 @@ exports.default = (function mithrilSelect(_a) {
             window.addEventListener('blur', onBlur, true);
             rootElement = dom;
         },
+        onupdate: function (_a) {
+            var dom = _a.dom;
+            rootElement = dom;
+        },
         onremove: function () {
             window.removeEventListener('focus', onFocus, true);
             window.removeEventListener('blur', onBlur, true);
         },
         view: function (_a) {
-            var _b = _a.attrs, id = _b.id, name = _b.name, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, labelId = _b.labelId, updatedOptions = _b.options, onchange = _b.onchange, klass = _b.class;
+            var _b = _a.attrs, id = _b.id, klass = _b.class, name = _b.name, value = _b.value, labelId = _b.labelId, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, updatedOptions = _b.options, onchange = _b.onchange;
             options = updatedOptions;
+            if (value !== undefined) {
+                curValue = value;
+            }
             var curOpt = findOption(options, curValue);
             if (!curOpt) {
+                curValue = undefined;
                 if (options.length > 0 && !promptContent) {
                     curOpt = options[0];
+                    curValue = options[0].value;
                 }
             }
             return m('.mithril-select', { class: klass }, m('.mithril-select-head', {
@@ -130,27 +155,11 @@ exports.default = (function mithrilSelect(_a) {
                     else if (e.keyCode === 37 || e.keyCode === 38) {
                         // When select head is focused, arrow keys cycle through options.
                         // Change to previous selection
-                        if (!options || options.length < 1)
-                            return;
-                        var index = 0;
-                        if (curValue !== undefined) {
-                            index = findOptionIndex(options, curValue);
-                            index = pmod(index - 1, options.length);
-                        }
-                        curValue = options[index].value;
-                        onchange && onchange(curValue);
+                        nextOption(-1, onchange);
                     }
                     else if (e.keyCode === 39 || e.keyCode === 40) {
                         // Change to next selection
-                        if (!options || options.length < 1)
-                            return;
-                        var index = 0;
-                        if (curValue !== undefined) {
-                            index = findOptionIndex(options, curValue);
-                            index = pmod(index + 1, options.length);
-                        }
-                        curValue = options[index].value;
-                        onchange && onchange(curValue);
+                        nextOption(1, onchange);
                     }
                 }
             }, !!curOpt
@@ -216,12 +225,13 @@ exports.default = (function mithrilSelect(_a) {
             }))), !!name && m('input', { name: name, type: 'hidden', value: curValue }));
         }
     };
-});
+};
+exports.default = mithrilSelect;
 /** Render content of the head or an option */
 function renderContent(content, attrs) {
     // What type is content...
-    if (content && (typeof content === 'function' || typeof content['view'] === 'function')) {
-        // Assume component - turn into vnode
+    if (content && (typeof content === 'function' || typeof content.view === 'function')) {
+        // Assume component - render vnode
         return m(content, attrs);
     }
     return content;

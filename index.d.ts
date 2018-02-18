@@ -1,8 +1,8 @@
 /// <reference types="mithril" />
 import * as m from 'mithril';
-/** Represents a single option in a select */
+/** Represents a single option in a mithril-select */
 export interface Option {
-    /** Unique value that identifies this option. */
+    /** Unique value that identifies this option. Can be any type except `undefined`. */
     value: any;
     /** Content to display for this option. Can be a string or component.
         If this property is omitted then the value property will be used for display. */
@@ -10,9 +10,9 @@ export interface Option {
     /** If content is a mithril component, this attrs object will be supplied to it. */
     attrs?: any;
 }
-/** Attrs object for MSelect component */
+/** Attrs object for mithril-select component */
 export interface Attrs {
-    /** Array of Option objects */
+    /** Array of `Option` objects */
     options: Option[];
     /** Optional prompt content to display until user selects an option.
         If this is omitted, the first option content will be displayed. */
@@ -21,16 +21,23 @@ export interface Attrs {
     promptAttrs?: any;
     /** Optional value to use for element id attribute. */
     id?: string;
-    /** Optional name of hidden input for form. If none supplied, no hidden input. */
+    /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
     name?: string;
+    /** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
+    value?: any;
     /** Optional label id to use for aria-labelledby attribute. */
     labelId?: string;
-    /** Value of option that will be selected on creation. Otherwise will be 1st option. */
+    /** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
+    initialValue?: any;
+    /** @deprecated Use `initialValue` instead. */
     defaultValue?: any;
     /** Additional class string to use on containing element. */
     class?: string;
-    /** Callback that will be passed the value of the selected option. */
+    /** Callback that will be passed the value of the selected option when selection changes. */
     onchange?(value: any): void;
 }
-declare const _default: m.FactoryComponent<Attrs>;
-export default _default;
+/**
+ * mithril-select Component
+ */
+declare const mithrilSelect: m.FactoryComponent<Attrs>;
+export default mithrilSelect;

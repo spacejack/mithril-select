@@ -1,6 +1,6 @@
 # Mithril Custom Select Component
 
-A custom select widget component for [Mithril](https://mithril.js.org/) 1.1. Built to mimic native browser select behaviour (if not looks) as closely as possible, including acessibility and keyboard features. The minimal CSS included can be overridden by your own styles.
+A custom select widget component for [Mithril.js](https://mithril.js.org/). Built to mimic native browser select behaviour (if not looks) as closely as possible, including acessibility and keyboard features. The minimal CSS included can be easily overridden and customized by your own styles.
 
 Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
@@ -8,15 +8,25 @@ Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
     npm install mithril-select
 
+You will need to include the css file for some basic working styles.
+
+Using PostCSS with [postcss-import](https://github.com/postcss/postcss-import) allows you to import the stylesheet from `node_modules`:
+
+```css
+@import "mithril-select";
+```
+
 If you're using a sass compiler, you can add:
 
 ```scss
-@import 'node_modules/mithril-select/index';
+@import "node_modules/mithril-select/index";
 ```
 
-to one of your sass files. Otherwise you can copy that `index.css` file to your project and add it to your html page.
+to one of your sass files.
 
-Note: Currently this component does not support changing select options between redraws.
+Otherwise you can copy the `node_modules/mithril-select/index.css` file to your project and add it to your html page.
+
+See the `example` in the git repository for examples of style customization.
 
 ## Example use:
 
@@ -62,7 +72,7 @@ const component = {
 ```typescript
 /** Represents a single option in a select */
 interface Option {
-  /** Unique value that identifies this option. */
+  /** Unique value that identifies this option. Can be any type except `undefined`. */
   value: any
   /** Content to display for this option. Can be a string or component.
       If this property is omitted then the value property will be used for display. */
@@ -82,12 +92,14 @@ interface Attrs {
   promptAttrs?: any
   /** Optional value to use for element id attribute. */
   id?: string
-  /** Optional name of hidden input for form. If none supplied, no hidden input. */
+  /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
   name?: string
+  /** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
+  value?: any
   /** Optional label id to use for aria-labelledby attribute. */
   labelId?: string
-  /** Value of option that will be selected on creation. Otherwise will be 1st option. */
-  defaultValue?: any
+  /** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
+  initialValue?: any
   /** Additional class string to use on containing element. */
   class?: string
   /** Callback that will be passed the value of the selected option. */

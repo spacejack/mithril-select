@@ -1,8 +1,8 @@
 import * as m from 'mithril'
 
-/** Represents a single option in a select */
+/** Represents a single option in a mithril-select */
 export interface Option {
-	/** Unique value that identifies this option. */
+	/** Unique value that identifies this option. Can be any type except `undefined`. */
 	value: any
 	/** Content to display for this option. Can be a string or component.
 	    If this property is omitted then the value property will be used for display. */
@@ -11,9 +11,9 @@ export interface Option {
 	attrs?: any
 }
 
-/** Attrs object for MSelect component */
+/** Attrs object for mithril-select component */
 export interface Attrs {
-	/** Array of Option objects */
+	/** Array of `Option` objects */
 	options: Option[]
 	/** Optional prompt content to display until user selects an option.
 	    If this is omitted, the first option content will be displayed. */
@@ -22,22 +22,28 @@ export interface Attrs {
 	promptAttrs?: any
 	/** Optional value to use for element id attribute. */
 	id?: string
-	/** Optional name of hidden input for form. If none supplied, no hidden input. */
+	/** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
 	name?: string
+	/** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
+	value?: any
 	/** Optional label id to use for aria-labelledby attribute. */
 	labelId?: string
-	/** Value of option that will be selected on creation. Otherwise will be 1st option. */
+	/** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
+	initialValue?: any
+	/** @deprecated Use `initialValue` instead. */
 	defaultValue?: any
 	/** Additional class string to use on containing element. */
 	class?: string
-	/** Callback that will be passed the value of the selected option. */
+	/** Callback that will be passed the value of the selected option when selection changes. */
 	onchange?(value: any): void
 }
 
 /**
  * mithril-select Component
  */
-export default (function mithrilSelect ({attrs: {defaultValue, promptContent, options}}) {
+const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
+	{attrs: {initialValue, defaultValue, value: firstValue, promptContent, options}}
+) {
 	let curValue: any = undefined
 	let isOpen = false
 	let isFocused = false
@@ -47,13 +53,23 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 	if (!promptContent && options && options.length > 0) {
 		curValue = options[0].value
 	}
-	if (defaultValue !== undefined) {
-		const o = findOption(options, defaultValue)
-		if (o) {
-			curValue = defaultValue
+	if (defaultValue !== undefined && initialValue === undefined) {
+		console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.')
+		initialValue = defaultValue
+	}
+	if (firstValue !== undefined) {
+		// If a `value` attr was supplied it overrides/is used as initialValue
+		if (findOption(options, firstValue)) {
+			initialValue = firstValue
 		} else {
-			console.warn(`defaultValue (${defaultValue}) does not exist in supplied MSelect Options.`)
-			defaultValue = undefined
+			console.warn(`mithril-select: value (${firstValue}) does not exist in supplied options.`)
+		}
+	}
+	if (initialValue !== undefined) {
+		if (findOption(options, initialValue)) {
+			curValue = initialValue
+		} else {
+			console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
 		}
 	}
 
@@ -96,12 +112,7 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 		// (like a native browser select.)
 		// Then we want to allow the arrow keys to move up & down.
 		if (options && options.length > 0) {
-			let i = 0
-			if (curValue !== undefined) {
-				i = findOptionIndex(options, curValue)
-			} else {
-				i = 0
-			}
+			const i = curValue !== undefined ? Math.max(0, findOptionIndex(options, curValue)) : 0
 			const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
 			// Must delay a frame before focusing
 			requestAnimationFrame(() => {
@@ -114,11 +125,26 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 		isOpen = false
 	}
 
+	function nextOption (dir: 1 | -1, onchange?: (value: any) => void) {
+		if (!options || options.length < 1) return
+		let index = 0
+		if (curValue !== undefined) {
+			index = findOptionIndex(options, curValue)
+			index = (index >= 0) ? pmod(index + dir, options.length) : 0
+		}
+		curValue = options[index].value
+		onchange && onchange(curValue)
+	}
+
 	// Return object with component hooks
 	return {
 		oncreate ({dom}) {
 			window.addEventListener('focus', onFocus, true)
 			window.addEventListener('blur', onBlur, true)
+			rootElement = dom as HTMLElement
+		},
+
+		onupdate ({dom}) {
 			rootElement = dom as HTMLElement
 		},
 
@@ -128,14 +154,20 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 		},
 
 		view ({attrs: {
-			id, name, promptContent, promptAttrs, labelId,
-			options: updatedOptions, onchange, class: klass
+			id, class: klass, name, value, labelId,
+			promptContent, promptAttrs,
+			options: updatedOptions, onchange
 		}}) {
 			options = updatedOptions
+			if (value !== undefined) {
+				curValue = value
+			}
 			let curOpt = findOption(options, curValue)
 			if (!curOpt) {
+				curValue = undefined
 				if (options.length > 0 && !promptContent) {
 					curOpt = options[0]
+					curValue = options[0].value
 				}
 			}
 
@@ -169,24 +201,10 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 							} else if (e.keyCode === 37 || e.keyCode === 38) {
 								// When select head is focused, arrow keys cycle through options.
 								// Change to previous selection
-								if (!options || options.length < 1) return
-								let index = 0
-								if (curValue !== undefined) {
-									index = findOptionIndex(options, curValue)
-									index = pmod(index - 1, options.length)
-								}
-								curValue = options[index].value
-								onchange && onchange(curValue)
+								nextOption(-1, onchange)
 							} else if (e.keyCode === 39 || e.keyCode === 40) {
 								// Change to next selection
-								if (!options || options.length < 1) return
-								let index = 0
-								if (curValue !== undefined) {
-									index = findOptionIndex(options, curValue)
-									index = pmod(index + 1, options.length)
-								}
-								curValue = options[index].value
-								onchange && onchange(curValue)
+								nextOption(1, onchange)
 							}
 						}
 					},
@@ -263,8 +281,9 @@ export default (function mithrilSelect ({attrs: {defaultValue, promptContent, op
 			)
 		}
 	}
-}) as m.FactoryComponent<Attrs>
+}
 
+export default mithrilSelect
 
 /** Render content of the head or an option */
 function renderContent (
@@ -272,8 +291,8 @@ function renderContent (
 	attrs?: any
 ): any {
 	// What type is content...
-	if (content && (typeof content === 'function' || typeof (content as any)['view'] === 'function')) {
-		// Assume component - turn into vnode
+	if (content && (typeof content === 'function' || typeof (content as any).view === 'function')) {
+		// Assume component - render vnode
 		return m(content as m.ComponentTypes<any,any>, attrs)
 	}
 	return content

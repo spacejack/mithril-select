@@ -79,7 +79,8 @@ interface State {
 /** Demo component */
 const demoComponent: m.FactoryComponent = function() {
 	let country = ""
-	let colour = ""
+	let colour = colours[0].content
+	let colourId = colours[0].value
 	let sport = ""
 	let language = ""
 	let native = ""
@@ -114,10 +115,13 @@ const demoComponent: m.FactoryComponent = function() {
 						// This select defaults to the first option
 						options: colours,
 						id: 'colour-select',
+						name: 'colour',  // Uses name
+						value: colourId, // and value like a regular select element
 						class: 'demo-select',
 						labelId: 'colour-label',
 						onchange: (val: string) => {
-							colour = colours.find(c => c.value === val)!.content
+							colourId = val
+							colour = colours.find(c => c.value === colourId)!.content
 						}
 					}
 				),
