@@ -9,6 +9,8 @@ export interface Option {
 	content?: string | m.ComponentTypes<any,any>
 	/** If content is a mithril component, this attrs object will be supplied to it. */
 	attrs?: any
+	/** Instead of `content` a `view` callback can be supplied to render vnode(s). */
+	view?(): m.Children
 }
 
 /** Attrs object for mithril-select component */
@@ -20,6 +22,8 @@ export interface Attrs {
 	promptContent?: string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>
 	/** If promptContent is a mithril component, this attrs object will be supplied to it. */
 	promptAttrs?: any
+	/** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
+	promptView?(): m.Children
 	/** Optional value to use for element id attribute. */
 	id?: string
 	/** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
@@ -42,7 +46,7 @@ export interface Attrs {
  * mithril-select Component
  */
 const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
-	{attrs: {initialValue, defaultValue, value: firstValue, promptContent, options}}
+	{attrs: {initialValue, defaultValue, value: firstValue, promptContent, promptView, options}}
 ) {
 	let curValue: any = undefined
 	let isOpen = false
@@ -50,7 +54,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 	let rootElement: HTMLElement = undefined as any
 	const uid = generateUid()
 
-	if (!promptContent && options && options.length > 0) {
+	if (!promptContent && !promptView && options && options.length > 0) {
 		curValue = options[0].value
 	}
 	if (defaultValue !== undefined && initialValue === undefined) {
@@ -155,7 +159,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 
 		view ({attrs: {
 			id, class: klass, name, value, labelId,
-			promptContent, promptAttrs,
+			promptContent, promptAttrs, promptView,
 			options: updatedOptions, onchange
 		}}) {
 			options = updatedOptions
@@ -209,8 +213,12 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 						}
 					},
 					!!curOpt
-						? renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-						: renderContent(promptContent, promptAttrs)
+						? curOpt.view
+							? curOpt.view()
+							: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
+						: promptView
+							? promptView()
+							: renderContent(promptContent, promptAttrs)
 				),
 				m('.mithril-select-body',
 					{class: isOpen ? 'mithril-select-body-open' : undefined},
@@ -272,7 +280,9 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 										}
 									}
 								},
-								renderContent(o.content, o.attrs)
+								o.view
+									? o.view()
+									: renderContent(o.content, o.attrs)
 							)
 						)
 					)
