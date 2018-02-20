@@ -4,10 +4,16 @@ import * as m from 'mithril'
 export interface Option {
 	/** Unique value that identifies this option. Can be any type except `undefined`. */
 	value: any
-	/** Content to display for this option. Can be a string or component.
-	    If this property is omitted then the value property will be used for display. */
+	/**
+	 * Content to display for this option. Can be a string or component.
+	 * If neither content or view are provided then the value property will be used for display.
+	 * Types other than string are deprecated. Use view instead of vnodes or components here.
+	 */
 	content?: string | m.ComponentTypes<any,any>
-	/** If content is a mithril component, this attrs object will be supplied to it. */
+	/**
+	 * @deprecated Use `view` instead.
+	 * If content is a mithril component, this attrs object will be supplied to it.
+	 */
 	attrs?: any
 	/** Instead of `content` a `view` callback can be supplied to render vnode(s). */
 	view?(): m.Children
@@ -17,10 +23,16 @@ export interface Option {
 export interface Attrs {
 	/** Array of `Option` objects */
 	options: Option[]
-	/** Optional prompt content to display until user selects an option.
-	    If this is omitted, the first option content will be displayed. */
+	/**
+	 * Optional prompt content to display until user selects an option.
+	 * If this is omitted, the first option content will be displayed.
+	 * Types other than string are deprecated. Use promptView instead of vnodes or components here.
+	 */
 	promptContent?: string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>
-	/** If promptContent is a mithril component, this attrs object will be supplied to it. */
+	/**
+	 * @deprecated Use promptView instead.
+	 * If promptContent is a mithril component, this attrs object will be supplied to it.
+	 */
 	promptAttrs?: any
 	/** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
 	promptView?(): m.Children
@@ -45,37 +57,42 @@ export interface Attrs {
 /**
  * mithril-select Component
  */
-const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
-	{attrs: {initialValue, defaultValue, value: firstValue, promptContent, promptView, options}}
-) {
-	let curValue: any = undefined
+const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) {
+	let curValue: any
 	let isOpen = false
 	let isFocused = false
-	let rootElement: HTMLElement = undefined as any
+	let rootElement: HTMLElement
+	let options = vnode.attrs.options
 	const uid = generateUid()
 
-	if (!promptContent && !promptView && options && options.length > 0) {
-		curValue = options[0].value
-	}
-	if (defaultValue !== undefined && initialValue === undefined) {
-		console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.')
-		initialValue = defaultValue
-	}
-	if (firstValue !== undefined) {
-		// If a `value` attr was supplied it overrides/is used as initialValue
-		if (findOption(options, firstValue)) {
-			initialValue = firstValue
-		} else {
-			console.warn(`mithril-select: value (${firstValue}) does not exist in supplied options.`)
+	// Create a scope for some initialization so these temp vars don't hang around.
+	;(function init() {
+		let {initialValue, defaultValue, value, promptContent, promptView} = vnode.attrs
+		if (!promptContent && !promptView && options && options.length > 0) {
+			curValue = options[0].value
 		}
-	}
-	if (initialValue !== undefined) {
-		if (findOption(options, initialValue)) {
-			curValue = initialValue
-		} else {
-			console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
+		if (defaultValue !== undefined && initialValue === undefined) {
+			console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.')
+			initialValue = defaultValue
 		}
-	}
+		if (value !== undefined) {
+			// If a `value` attr was supplied it overrides/is used as initialValue
+			if (findOption(options, value)) {
+				initialValue = value
+			} else {
+				console.warn(`mithril-select: value (${value}) does not exist in supplied options.`)
+			}
+		}
+		if (initialValue !== undefined) {
+			if (findOption(options, initialValue)) {
+				curValue = initialValue
+			} else {
+				console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
+			}
+		}
+		// Destroy reference to our initial vnode
+		vnode = undefined as any
+	}())
 
 	/** Handle event when child element is focused */
 	function onFocus (e: FocusEvent) {
@@ -157,12 +174,12 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 			window.removeEventListener('blur', onBlur, true)
 		},
 
-		view ({attrs: {
-			id, class: klass, name, value, labelId,
-			promptContent, promptAttrs, promptView,
-			options: updatedOptions, onchange
-		}}) {
-			options = updatedOptions
+		view ({attrs}) {
+			const {
+				id, class: klass, name, value, labelId,
+				promptContent, promptAttrs, onchange
+			} = attrs
+			options = attrs.options
 			if (value !== undefined) {
 				curValue = value
 			}
@@ -216,8 +233,8 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (
 						? curOpt.view
 							? curOpt.view()
 							: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-						: promptView
-							? promptView()
+						: attrs.promptView
+							? attrs.promptView()
 							: renderContent(promptContent, promptAttrs)
 				),
 				m('.mithril-select-body',

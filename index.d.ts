@@ -4,21 +4,37 @@ import * as m from 'mithril';
 export interface Option {
     /** Unique value that identifies this option. Can be any type except `undefined`. */
     value: any;
-    /** Content to display for this option. Can be a string or component.
-        If this property is omitted then the value property will be used for display. */
+    /**
+     * Content to display for this option. Can be a string or component.
+     * If neither content or view are provided then the value property will be used for display.
+     * Types other than string are deprecated. Use view instead of vnodes or components here.
+     */
     content?: string | m.ComponentTypes<any, any>;
-    /** If content is a mithril component, this attrs object will be supplied to it. */
+    /**
+     * @deprecated Use `view` instead.
+     * If content is a mithril component, this attrs object will be supplied to it.
+     */
     attrs?: any;
+    /** Instead of `content` a `view` callback can be supplied to render vnode(s). */
+    view?(): m.Children;
 }
 /** Attrs object for mithril-select component */
 export interface Attrs {
     /** Array of `Option` objects */
     options: Option[];
-    /** Optional prompt content to display until user selects an option.
-        If this is omitted, the first option content will be displayed. */
+    /**
+     * Optional prompt content to display until user selects an option.
+     * If this is omitted, the first option content will be displayed.
+     * Types other than string are deprecated. Use promptView instead of vnodes or components here.
+     */
     promptContent?: string | m.Vnode<any, any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>;
-    /** If promptContent is a mithril component, this attrs object will be supplied to it. */
+    /**
+     * @deprecated Use promptView instead.
+     * If promptContent is a mithril component, this attrs object will be supplied to it.
+     */
     promptAttrs?: any;
+    /** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
+    promptView?(): m.Children;
     /** Optional value to use for element id attribute. */
     id?: string;
     /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */

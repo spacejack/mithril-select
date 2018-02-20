@@ -4,37 +4,42 @@ var m = require("mithril");
 /**
  * mithril-select Component
  */
-var mithrilSelect = function mithrilSelect(_a) {
-    var _b = _a.attrs, initialValue = _b.initialValue, defaultValue = _b.defaultValue, firstValue = _b.value, promptContent = _b.promptContent, options = _b.options;
-    var curValue = undefined;
+var mithrilSelect = function mithrilSelect(vnode) {
+    var curValue;
     var isOpen = false;
     var isFocused = false;
-    var rootElement = undefined;
+    var rootElement;
+    var options = vnode.attrs.options;
     var uid = generateUid();
-    if (!promptContent && options && options.length > 0) {
-        curValue = options[0].value;
-    }
-    if (defaultValue !== undefined && initialValue === undefined) {
-        console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.');
-        initialValue = defaultValue;
-    }
-    if (firstValue !== undefined) {
-        // If a `value` attr was supplied it overrides/is used as initialValue
-        if (findOption(options, firstValue)) {
-            initialValue = firstValue;
+    (function init() {
+        var _a = vnode.attrs, initialValue = _a.initialValue, defaultValue = _a.defaultValue, value = _a.value, promptContent = _a.promptContent, promptView = _a.promptView;
+        if (!promptContent && !promptView && options && options.length > 0) {
+            curValue = options[0].value;
         }
-        else {
-            console.warn("mithril-select: value (" + firstValue + ") does not exist in supplied options.");
+        if (defaultValue !== undefined && initialValue === undefined) {
+            console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.');
+            initialValue = defaultValue;
         }
-    }
-    if (initialValue !== undefined) {
-        if (findOption(options, initialValue)) {
-            curValue = initialValue;
+        if (value !== undefined) {
+            // If a `value` attr was supplied it overrides/is used as initialValue
+            if (findOption(options, value)) {
+                initialValue = value;
+            }
+            else {
+                console.warn("mithril-select: value (" + value + ") does not exist in supplied options.");
+            }
         }
-        else {
-            console.warn("mithril-select: initialValue (" + initialValue + ") does not exist in supplied options.");
+        if (initialValue !== undefined) {
+            if (findOption(options, initialValue)) {
+                curValue = initialValue;
+            }
+            else {
+                console.warn("mithril-select: initialValue (" + initialValue + ") does not exist in supplied options.");
+            }
         }
-    }
+        // Destroy reference to our initial vnode
+        vnode = undefined;
+    }());
     /** Handle event when child element is focused */
     function onFocus(e) {
         if (e.target instanceof Node && rootElement.contains(e.target)) {
@@ -111,8 +116,9 @@ var mithrilSelect = function mithrilSelect(_a) {
             window.removeEventListener('blur', onBlur, true);
         },
         view: function (_a) {
-            var _b = _a.attrs, id = _b.id, klass = _b.class, name = _b.name, value = _b.value, labelId = _b.labelId, promptContent = _b.promptContent, promptAttrs = _b.promptAttrs, updatedOptions = _b.options, onchange = _b.onchange;
-            options = updatedOptions;
+            var attrs = _a.attrs;
+            var id = attrs.id, klass = attrs.class, name = attrs.name, value = attrs.value, labelId = attrs.labelId, promptContent = attrs.promptContent, promptAttrs = attrs.promptAttrs, onchange = attrs.onchange;
+            options = attrs.options;
             if (value !== undefined) {
                 curValue = value;
             }
@@ -163,8 +169,12 @@ var mithrilSelect = function mithrilSelect(_a) {
                     }
                 }
             }, !!curOpt
-                ? renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-                : renderContent(promptContent, promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
+                ? curOpt.view
+                    ? curOpt.view()
+                    : renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
+                : attrs.promptView
+                    ? attrs.promptView()
+                    : renderContent(promptContent, promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
                 role: 'listbox',
                 'aria-hidden': isOpen ? 'true' : 'false',
                 id: uid
@@ -221,7 +231,9 @@ var mithrilSelect = function mithrilSelect(_a) {
                             });
                         }
                     }
-                }, renderContent(o.content, o.attrs));
+                }, o.view
+                    ? o.view()
+                    : renderContent(o.content, o.attrs));
             }))), !!name && m('input', { name: name, type: 'hidden', value: curValue }));
         }
     };
