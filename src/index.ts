@@ -118,15 +118,15 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		}
 	}
 
-	function toggle (options: Option[]) {
+	function toggle () {
 		if (!isOpen) {
-			open(options)
+			open()
 		} else {
 			close()
 		}
 	}
 
-	function open (options: Option[]) {
+	function open () {
 		isOpen = true
 		// When the component is opened, the idea is to focus
 		// either the currently selected option or the first one
@@ -205,12 +205,12 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						onclick: (e: MouseEvent) => {
 							e.stopPropagation()
 							if (!isOpen) e.preventDefault()
-							toggle(options)
+							toggle()
 						},
 						onkeydown: (e: KeyboardEvent) => {
 							if (e.keyCode === 32) {
 								e.preventDefault()
-								toggle(options)
+								toggle()
 							} else if (e.keyCode === 27) {
 								if (isOpen) {
 									close()
