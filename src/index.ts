@@ -249,10 +249,6 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			rootElement = dom as HTMLElement
 		},
 
-		onbeforeupdate (vnode) {
-			onchange = vnode.attrs.onchange
-		},
-
 		onupdate ({dom}) {
 			rootElement = dom as HTMLElement
 		},
@@ -267,6 +263,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 				id, class: klass, name, value, labelId, promptContent, promptAttrs
 			} = attrs
 			options = attrs.options
+			onchange = attrs.onchange
 			if (value !== undefined) {
 				curValue = value
 			}
