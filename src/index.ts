@@ -63,6 +63,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 	let isFocused = false
 	let rootElement: HTMLElement
 	let options = vnode.attrs.options
+	let onchange = vnode.attrs.onchange
 	const uid = generateUid()
 
 	// Create a scope for some initialization so these temp vars don't hang around.
@@ -157,12 +158,99 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		onchange && onchange(curValue)
 	}
 
+	/** Handle click events on select head */
+	function onClickHead (e: MouseEvent) {
+		e.stopPropagation()
+		if (!isOpen) e.preventDefault()
+		toggle()
+	}
+
+	/** Handle keydown events on select head */
+	function onKeydownHead (e: KeyboardEvent) {
+		if (e.keyCode === 32) {
+			e.preventDefault()
+			toggle()
+		} else if (e.keyCode === 27) {
+			if (isOpen) {
+				close()
+				// Re-focus head on close
+				requestAnimationFrame(() => {
+					(rootElement.childNodes[0] as HTMLElement).focus()
+				})
+			}
+		} else if (e.keyCode === 37 || e.keyCode === 38) {
+			// When select head is focused, arrow keys cycle through options.
+			// Change to previous selection
+			nextOption(-1, onchange)
+		} else if (e.keyCode === 39 || e.keyCode === 40) {
+			// Change to next selection
+			nextOption(1, onchange)
+		}
+	}
+
+	/** Handle click events on select options */
+	function onClickOption (e: Event) {
+		e.stopPropagation()
+		const opt = options[Number((e.currentTarget as HTMLElement).getAttribute('data-index'))]
+		curValue = opt.value
+		isFocused = false
+		close()
+		// Re-focus head on close
+		requestAnimationFrame(() => {
+			(rootElement.childNodes[0] as HTMLElement).focus()
+		})
+		onchange && onchange(opt.value)
+	}
+
+	/** Handle keydown events on select options */
+	function onKeydownOption (e: KeyboardEvent) {
+		const index = Number((e.currentTarget as HTMLElement).getAttribute('data-index'))
+		const opt = options[index]
+		if (e.keyCode === 13) {
+			// Enter selects
+			curValue = opt.value
+			isFocused = false
+			close()
+			// Re-focus head on close
+			requestAnimationFrame(() => {
+				(rootElement.childNodes[0] as HTMLElement).focus()
+			})
+			onchange && onchange(opt.value)
+		} else if (e.keyCode === 27) {
+			// Escape closes
+			close()
+			// Re-focus head on close
+			requestAnimationFrame(() => {
+				(rootElement.childNodes[0] as HTMLElement).focus()
+			})
+		} else if (e.keyCode === 37 || e.keyCode === 38) {
+			// Left or up keys - focus previous
+			const i = pmod(index - 1, options.length)
+			const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
+			// Must delay a frame before focusing
+			requestAnimationFrame(() => {
+				elOpt.focus()
+			})
+		} else if (e.keyCode === 39 || e.keyCode === 40) {
+			// Right or down keys - focus next
+			const i = pmod(index + 1, options.length)
+			const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
+			requestAnimationFrame(() => {
+				elOpt.focus()
+			})
+		}
+	}
+
 	// Return object with component hooks
 	return {
 		oncreate ({dom}) {
 			window.addEventListener('focus', onFocus, true)
 			window.addEventListener('blur', onBlur, true)
 			rootElement = dom as HTMLElement
+		},
+
+		onbeforeupdate (vnode) {
+			onchange = vnode.attrs.onchange
 		},
 
 		onupdate ({dom}) {
@@ -176,8 +264,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 
 		view ({attrs}) {
 			const {
-				id, class: klass, name, value, labelId,
-				promptContent, promptAttrs, onchange
+				id, class: klass, name, value, labelId, promptContent, promptAttrs
 			} = attrs
 			options = attrs.options
 			if (value !== undefined) {
@@ -202,32 +289,8 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						'aria-labelledby': labelId,
 						id: id,
 						tabIndex: '0',
-						onclick: (e: MouseEvent) => {
-							e.stopPropagation()
-							if (!isOpen) e.preventDefault()
-							toggle()
-						},
-						onkeydown: (e: KeyboardEvent) => {
-							if (e.keyCode === 32) {
-								e.preventDefault()
-								toggle()
-							} else if (e.keyCode === 27) {
-								if (isOpen) {
-									close()
-									// Re-focus head on close
-									requestAnimationFrame(() => {
-										(rootElement.childNodes[0] as HTMLElement).focus()
-									})
-								}
-							} else if (e.keyCode === 37 || e.keyCode === 38) {
-								// When select head is focused, arrow keys cycle through options.
-								// Change to previous selection
-								nextOption(-1, onchange)
-							} else if (e.keyCode === 39 || e.keyCode === 40) {
-								// Change to next selection
-								nextOption(1, onchange)
-							}
-						}
+						onclick: onClickHead,
+						onkeydown: onKeydownHead
 					},
 					!!curOpt
 						? curOpt.view
@@ -248,54 +311,12 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						options.map((o, index) =>
 							m('li.mithril-select-option',
 								{
-									'aria-role': 'option',
+									key: index,
 									tabIndex: '-1',
-									onclick: (e: Event) => {
-										e.stopPropagation()
-										curValue = o.value
-										isFocused = false
-										close()
-										// Re-focus head on close
-										requestAnimationFrame(() => {
-											(rootElement.childNodes[0] as HTMLElement).focus()
-										})
-										onchange && onchange(o.value)
-									},
-									onkeydown: (e: KeyboardEvent) => {
-										if (e.keyCode === 13) {
-											// Enter selects
-											curValue = o.value
-											isFocused = false
-											close()
-											// Re-focus head on close
-											requestAnimationFrame(() => {
-												(rootElement.childNodes[0] as HTMLElement).focus()
-											})
-											onchange && onchange(o.value)
-										} else if (e.keyCode === 27) {
-											// Escape closes
-											close()
-											// Re-focus head on close
-											requestAnimationFrame(() => {
-												(rootElement.childNodes[0] as HTMLElement).focus()
-											})
-										} else if (e.keyCode === 37 || e.keyCode === 38) {
-											// Left or up keys - focus previous
-											const i = pmod(index - 1, options.length)
-											const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
-											// Must delay a frame before focusing
-											requestAnimationFrame(() => {
-												elOpt.focus()
-											})
-										} else if (e.keyCode === 39 || e.keyCode === 40) {
-											// Right or down keys - focus next
-											const i = pmod(index + 1, options.length)
-											const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
-											requestAnimationFrame(() => {
-												elOpt.focus()
-											})
-										}
-									}
+									'aria-role': 'option',
+									'data-index': String(index),
+									onclick: onClickOption,
+									onkeydown: onKeydownOption
 								},
 								o.view
 									? o.view()
