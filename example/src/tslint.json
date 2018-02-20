@@ -1,44 +1,50 @@
 {
+  "extends": ["tslint-microsoft-contrib"],
+  "defaultSeverity": "warn",
   "rules": {
-    "class-name": true,
-    "comment-format": [
-      false,
-      "check-space"
-    ],
-    "no-duplicate-variable": true,
-    "no-eval": true,
-    "no-internal-module": false,
-    "no-trailing-whitespace": true,
+    "align": [false],
+    "curly": false,
+    "export-name": false,
+    "function-name": false,
+    "import-name": false,
+    "indent": [true, "tabs"],
+    "insecure-random": false,
+    "interface-name": false,
+    "jsdoc-format": false,
+    "max-func-body-length": false,
+    "member-access": false,
+    "member-ordering": false,
+    "missing-jsdoc": false,
+    "newline-before-return": false,
+    "no-any": false,
+    "no-bitwise": false,
+    "no-console": false,
+    "no-default-export": false,
+    "no-function-expression": false,
+    "no-implicit-dependencies": false,
+    "no-increment-decrement": false,
+    "no-object-literal-type-assertion": false,
+    "no-parameter-reassignment": false,
+    "no-reference": false,
+    "no-relative-imports": false,
+    "no-reserved-keywords": false,
+    "no-single-line-block-comment": false,
+    "no-submodule-imports": false,
+    "no-unnecessary-field-initialization": false,
+    "no-unused-expression": false,
     "no-unused-variable": true,
-    "no-var-keyword": true,
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-whitespace"
-    ],
-    "quotemark": [
-      false,
-      "double"
-    ],
+    "number-literal-format": false,
+    "one-variable-per-declaration": false,
+    "ordered-imports": [false],
+    "prefer-array-literal": false,
+    "prefer-for-of": false,
+    "prefer-object-spread": false,
+    "prefer-template": false,
+    "prefer-type-cast": false,
+    "quotemark": false,
     "semicolon": [true, "never"],
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
-    "typedef-whitespace": [
-      false,
-      {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
-      }
-    ],
-    "variable-name": [
-      true,
-      "ban-keywords"
-    ],
+    "typedef": [false],
+    "use-named-parameter": false,
     "whitespace": [
       true,
       "check-branch",

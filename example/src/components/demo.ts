@@ -31,7 +31,7 @@ const sports = [
 	{value: 4, content: sportOption, attrs: {text: "Football", image: "img/football.png"}},
 	{value: 5, content: sportOption, attrs: {text: "Hockey", image: "img/hockey.png"}},
 	{value: 6, content: sportOption, attrs: {text: "Pool", image: "img/pool.png"}},
-	{value: 7, content: sportOption, attrs: {text: "Soccer", image: "img/soccer.png"}},
+	{value: 7, content: sportOption, attrs: {text: "Soccer", image: "img/soccer.png"}}
 ]
 
 const languages = [

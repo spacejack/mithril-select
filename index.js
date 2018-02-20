@@ -13,7 +13,8 @@ var mithrilSelect = function mithrilSelect(vnode) {
     var onchange = vnode.attrs.onchange;
     var uid = generateUid();
     (function init() {
-        var _a = vnode.attrs, initialValue = _a.initialValue, defaultValue = _a.defaultValue, value = _a.value, promptContent = _a.promptContent, promptView = _a.promptView;
+        var _a = vnode.attrs, defaultValue = _a.defaultValue, value = _a.value, promptContent = _a.promptContent, promptView = _a.promptView;
+        var initialValue = vnode.attrs.initialValue;
         if (!promptContent && !promptView && options && options.length > 0) {
             curValue = options[0].value;
         }
@@ -264,8 +265,8 @@ function renderContent(content, attrs) {
     return content;
 }
 /** Always positive modulus */
-function pmod(n, m) {
-    return ((n % m + m) % m);
+function pmod(n, d) {
+    return ((n % d + d) % d);
 }
 /** Generate an ID for aria */
 function generateUid() {

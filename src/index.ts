@@ -9,7 +9,7 @@ export interface Option {
 	 * If neither content or view are provided then the value property will be used for display.
 	 * Types other than string are deprecated. Use view instead of vnodes or components here.
 	 */
-	content?: string | m.ComponentTypes<any,any>
+	content?: string | m.ComponentTypes<any, any>
 	/**
 	 * @deprecated Use `view` instead.
 	 * If content is a mithril component, this attrs object will be supplied to it.
@@ -28,7 +28,7 @@ export interface Attrs {
 	 * If this is omitted, the first option content will be displayed.
 	 * Types other than string are deprecated. Use promptView instead of vnodes or components here.
 	 */
-	promptContent?: string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>
+	promptContent?: string | m.Vnode<any,any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>
 	/**
 	 * @deprecated Use promptView instead.
 	 * If promptContent is a mithril component, this attrs object will be supplied to it.
@@ -38,7 +38,10 @@ export interface Attrs {
 	promptView?(): m.Children
 	/** Optional value to use for element id attribute. */
 	id?: string
-	/** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
+	/**
+	 * Optional name of hidden input for form. If none supplied, no hidden input will be rendered.
+	 * Hidden input value will be coerced to string.
+	 */
 	name?: string
 	/** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
 	value?: any
@@ -57,7 +60,7 @@ export interface Attrs {
 /**
  * mithril-select Component
  */
-const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) {
+const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) { // tslint:disable-line no-shadowed-variable
 	let curValue: any
 	let isOpen = false
 	let isFocused = false
@@ -68,7 +71,8 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 
 	// Create a scope for some initialization so these temp vars don't hang around.
 	;(function init() {
-		let {initialValue, defaultValue, value, promptContent, promptView} = vnode.attrs
+		const {defaultValue, value, promptContent, promptView} = vnode.attrs
+		let initialValue = vnode.attrs.initialValue
 		if (!promptContent && !promptView && options && options.length > 0) {
 			curValue = options[0].value
 		}
@@ -331,20 +335,20 @@ export default mithrilSelect
 
 /** Render content of the head or an option */
 function renderContent (
-	content?: null | undefined | string | m.Vnode<any,any> | m.Vnode<any,any>[] | m.ComponentTypes<any,any>,
+	content?: null | undefined | string | m.Vnode<any, any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>,
 	attrs?: any
 ): any {
 	// What type is content...
 	if (content && (typeof content === 'function' || typeof (content as any).view === 'function')) {
 		// Assume component - render vnode
-		return m(content as m.ComponentTypes<any,any>, attrs)
+		return m(content as m.ComponentTypes<any, any>, attrs)
 	}
 	return content
 }
 
 /** Always positive modulus */
-function pmod (n: number, m: number) {
-	return ((n % m + m) % m)
+function pmod (n: number, d: number) {
+	return ((n % d + d) % d)
 }
 
 /** Generate an ID for aria */

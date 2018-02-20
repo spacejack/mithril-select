@@ -37,7 +37,10 @@ export interface Attrs {
     promptView?(): m.Children;
     /** Optional value to use for element id attribute. */
     id?: string;
-    /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
+    /**
+     * Optional name of hidden input for form. If none supplied, no hidden input will be rendered.
+     * Hidden input value will be coerced to string.
+     */
     name?: string;
     /** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
     value?: any;
