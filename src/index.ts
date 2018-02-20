@@ -259,32 +259,29 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		},
 
 		view ({attrs}) {
-			const {
-				id, class: klass, name, value, labelId, promptContent, promptAttrs
-			} = attrs
 			options = attrs.options
 			onchange = attrs.onchange
-			if (value !== undefined) {
-				curValue = value
+			if (attrs.value !== undefined) {
+				curValue = attrs.value
 			}
 			let curOpt = findOption(options, curValue)
 			if (!curOpt) {
 				curValue = undefined
-				if (options.length > 0 && !promptContent) {
+				if (options.length > 0 && !attrs.promptContent) {
 					curOpt = options[0]
 					curValue = options[0].value
 				}
 			}
 
-			return m('.mithril-select', {class: klass},
+			return m('.mithril-select', {class: attrs.class},
 				m('.mithril-select-head',
 					{
 						role: 'combobox',
 						'aria-expanded': isOpen ? 'true' : 'false',
 						'aria-haspopup': 'true',
 						'aria-owns': uid,
-						'aria-labelledby': labelId,
-						id: id,
+						'aria-labelledby': attrs.labelId,
+						id: attrs.id,
 						tabIndex: '0',
 						onclick: onClickHead,
 						onkeydown: onKeydownHead
@@ -295,7 +292,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 							: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
 						: attrs.promptView
 							? attrs.promptView()
-							: renderContent(promptContent, promptAttrs)
+							: renderContent(attrs.promptContent, attrs.promptAttrs)
 				),
 				m('.mithril-select-body',
 					{class: isOpen ? 'mithril-select-body-open' : undefined},

@@ -10,6 +10,7 @@ var mithrilSelect = function mithrilSelect(vnode) {
     var isFocused = false;
     var rootElement;
     var options = vnode.attrs.options;
+    var onchange = vnode.attrs.onchange;
     var uid = generateUid();
     (function init() {
         var _a = vnode.attrs, initialValue = _a.initialValue, defaultValue = _a.defaultValue, value = _a.value, promptContent = _a.promptContent, promptView = _a.promptView;
@@ -62,15 +63,15 @@ var mithrilSelect = function mithrilSelect(vnode) {
             });
         }
     }
-    function toggle(options) {
+    function toggle() {
         if (!isOpen) {
-            open(options);
+            open();
         }
         else {
             close();
         }
     }
-    function open(options) {
+    function open() {
         isOpen = true;
         // When the component is opened, the idea is to focus
         // either the currently selected option or the first one
@@ -99,6 +100,92 @@ var mithrilSelect = function mithrilSelect(vnode) {
         curValue = options[index].value;
         onchange && onchange(curValue);
     }
+    /** Handle click events on select head */
+    function onClickHead(e) {
+        e.stopPropagation();
+        if (!isOpen)
+            e.preventDefault();
+        toggle();
+    }
+    /** Handle keydown events on select head */
+    function onKeydownHead(e) {
+        if (e.keyCode === 32) {
+            e.preventDefault();
+            toggle();
+        }
+        else if (e.keyCode === 27) {
+            if (isOpen) {
+                close();
+                // Re-focus head on close
+                requestAnimationFrame(function () {
+                    rootElement.childNodes[0].focus();
+                });
+            }
+        }
+        else if (e.keyCode === 37 || e.keyCode === 38) {
+            // When select head is focused, arrow keys cycle through options.
+            // Change to previous selection
+            nextOption(-1, onchange);
+        }
+        else if (e.keyCode === 39 || e.keyCode === 40) {
+            // Change to next selection
+            nextOption(1, onchange);
+        }
+    }
+    /** Handle click events on select options */
+    function onClickOption(e) {
+        e.stopPropagation();
+        var opt = options[Number(e.currentTarget.getAttribute('data-index'))];
+        curValue = opt.value;
+        isFocused = false;
+        close();
+        // Re-focus head on close
+        requestAnimationFrame(function () {
+            rootElement.childNodes[0].focus();
+        });
+        onchange && onchange(opt.value);
+    }
+    /** Handle keydown events on select options */
+    function onKeydownOption(e) {
+        var index = Number(e.currentTarget.getAttribute('data-index'));
+        var opt = options[index];
+        if (e.keyCode === 13) {
+            // Enter selects
+            curValue = opt.value;
+            isFocused = false;
+            close();
+            // Re-focus head on close
+            requestAnimationFrame(function () {
+                rootElement.childNodes[0].focus();
+            });
+            onchange && onchange(opt.value);
+        }
+        else if (e.keyCode === 27) {
+            // Escape closes
+            close();
+            // Re-focus head on close
+            requestAnimationFrame(function () {
+                rootElement.childNodes[0].focus();
+            });
+        }
+        else if (e.keyCode === 37 || e.keyCode === 38) {
+            // Left or up keys - focus previous
+            var i = pmod(index - 1, options.length);
+            var elOpt_2 = rootElement.childNodes[1].childNodes[0].childNodes[i];
+            // Must delay a frame before focusing
+            requestAnimationFrame(function () {
+                elOpt_2.focus();
+            });
+        }
+        else if (e.keyCode === 39 || e.keyCode === 40) {
+            // Right or down keys - focus next
+            var i = pmod(index + 1, options.length);
+            var elOpt_3 = rootElement.childNodes[1].childNodes[0].childNodes[i];
+            requestAnimationFrame(function () {
+                elOpt_3.focus();
+            });
+        }
+    }
     // Return object with component hooks
     return {
         oncreate: function (_a) {
@@ -117,120 +204,47 @@ var mithrilSelect = function mithrilSelect(vnode) {
         },
         view: function (_a) {
             var attrs = _a.attrs;
-            var id = attrs.id, klass = attrs.class, name = attrs.name, value = attrs.value, labelId = attrs.labelId, promptContent = attrs.promptContent, promptAttrs = attrs.promptAttrs, onchange = attrs.onchange;
             options = attrs.options;
-            if (value !== undefined) {
-                curValue = value;
+            onchange = attrs.onchange;
+            if (attrs.value !== undefined) {
+                curValue = attrs.value;
             }
             var curOpt = findOption(options, curValue);
             if (!curOpt) {
                 curValue = undefined;
-                if (options.length > 0 && !promptContent) {
+                if (options.length > 0 && !attrs.promptContent) {
                     curOpt = options[0];
                     curValue = options[0].value;
                 }
             }
-            return m('.mithril-select', { class: klass }, m('.mithril-select-head', {
+            return m('.mithril-select', { class: attrs.class }, m('.mithril-select-head', {
                 role: 'combobox',
                 'aria-expanded': isOpen ? 'true' : 'false',
                 'aria-haspopup': 'true',
                 'aria-owns': uid,
-                'aria-labelledby': labelId,
-                id: id,
+                'aria-labelledby': attrs.labelId,
+                id: attrs.id,
                 tabIndex: '0',
-                onclick: function (e) {
-                    e.stopPropagation();
-                    if (!isOpen)
-                        e.preventDefault();
-                    toggle(options);
-                },
-                onkeydown: function (e) {
-                    if (e.keyCode === 32) {
-                        e.preventDefault();
-                        toggle(options);
-                    }
-                    else if (e.keyCode === 27) {
-                        if (isOpen) {
-                            close();
-                            // Re-focus head on close
-                            requestAnimationFrame(function () {
-                                rootElement.childNodes[0].focus();
-                            });
-                        }
-                    }
-                    else if (e.keyCode === 37 || e.keyCode === 38) {
-                        // When select head is focused, arrow keys cycle through options.
-                        // Change to previous selection
-                        nextOption(-1, onchange);
-                    }
-                    else if (e.keyCode === 39 || e.keyCode === 40) {
-                        // Change to next selection
-                        nextOption(1, onchange);
-                    }
-                }
+                onclick: onClickHead,
+                onkeydown: onKeydownHead
             }, !!curOpt
                 ? curOpt.view
                     ? curOpt.view()
                     : renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
                 : attrs.promptView
                     ? attrs.promptView()
-                    : renderContent(promptContent, promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
+                    : renderContent(attrs.promptContent, attrs.promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
                 role: 'listbox',
                 'aria-hidden': isOpen ? 'true' : 'false',
                 id: uid
             }, options.map(function (o, index) {
                 return m('li.mithril-select-option', {
-                    'aria-role': 'option',
+                    key: index,
                     tabIndex: '-1',
-                    onclick: function (e) {
-                        e.stopPropagation();
-                        curValue = o.value;
-                        isFocused = false;
-                        close();
-                        // Re-focus head on close
-                        requestAnimationFrame(function () {
-                            rootElement.childNodes[0].focus();
-                        });
-                        onchange && onchange(o.value);
-                    },
-                    onkeydown: function (e) {
-                        if (e.keyCode === 13) {
-                            // Enter selects
-                            curValue = o.value;
-                            isFocused = false;
-                            close();
-                            // Re-focus head on close
-                            requestAnimationFrame(function () {
-                                rootElement.childNodes[0].focus();
-                            });
-                            onchange && onchange(o.value);
-                        }
-                        else if (e.keyCode === 27) {
-                            // Escape closes
-                            close();
-                            // Re-focus head on close
-                            requestAnimationFrame(function () {
-                                rootElement.childNodes[0].focus();
-                            });
-                        }
-                        else if (e.keyCode === 37 || e.keyCode === 38) {
-                            // Left or up keys - focus previous
-                            var i = pmod(index - 1, options.length);
-                            var elOpt_2 = rootElement.childNodes[1].childNodes[0].childNodes[i];
-                            // Must delay a frame before focusing
-                            requestAnimationFrame(function () {
-                                elOpt_2.focus();
-                            });
-                        }
-                        else if (e.keyCode === 39 || e.keyCode === 40) {
-                            // Right or down keys - focus next
-                            var i = pmod(index + 1, options.length);
-                            var elOpt_3 = rootElement.childNodes[1].childNodes[0].childNodes[i];
-                            requestAnimationFrame(function () {
-                                elOpt_3.focus();
-                            });
-                        }
-                    }
+                    'aria-role': 'option',
+                    'data-index': String(index),
+                    onclick: onClickOption,
+                    onkeydown: onKeydownOption
                 }, o.view
                     ? o.view()
                     : renderContent(o.content, o.attrs));
