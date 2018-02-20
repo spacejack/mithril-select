@@ -147,7 +147,8 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		isOpen = false
 	}
 
-	function nextOption (dir: 1 | -1, onchange?: (value: any) => void) {
+	/** Select next option in closed select with keyboard */
+	function selectNextOption (dir: 1 | -1) {
 		if (!options || options.length < 1) return
 		let index = 0
 		if (curValue !== undefined) {
@@ -156,6 +157,16 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		}
 		curValue = options[index].value
 		onchange && onchange(curValue)
+	}
+
+	/** Focus next option when navigating open select with keyboard */
+	function focusNextOption (index: number, dir: 1 | -1) {
+		const i = pmod(index + dir, options.length)
+		const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
+		// Must delay a frame before focusing
+		requestAnimationFrame(() => {
+			elOpt.focus()
+		})
 	}
 
 	/** Handle click events on select head */
@@ -181,10 +192,10 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		} else if (e.keyCode === 37 || e.keyCode === 38) {
 			// When select head is focused, arrow keys cycle through options.
 			// Change to previous selection
-			nextOption(-1, onchange)
+			selectNextOption(-1)
 		} else if (e.keyCode === 39 || e.keyCode === 40) {
 			// Change to next selection
-			nextOption(1, onchange)
+			selectNextOption(1)
 		}
 	}
 
@@ -225,19 +236,10 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			})
 		} else if (e.keyCode === 37 || e.keyCode === 38) {
 			// Left or up keys - focus previous
-			const i = pmod(index - 1, options.length)
-			const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
-			// Must delay a frame before focusing
-			requestAnimationFrame(() => {
-				elOpt.focus()
-			})
+			focusNextOption(index, -1)
 		} else if (e.keyCode === 39 || e.keyCode === 40) {
 			// Right or down keys - focus next
-			const i = pmod(index + 1, options.length)
-			const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
-			requestAnimationFrame(() => {
-				elOpt.focus()
-			})
+			focusNextOption(index, 1)
 		}
 	}
 

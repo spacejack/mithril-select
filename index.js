@@ -89,7 +89,8 @@ var mithrilSelect = function mithrilSelect(vnode) {
     function close() {
         isOpen = false;
     }
-    function nextOption(dir, onchange) {
+    /** Select next option in closed select with keyboard */
+    function selectNextOption(dir) {
         if (!options || options.length < 1)
             return;
         var index = 0;
@@ -99,6 +100,15 @@ var mithrilSelect = function mithrilSelect(vnode) {
         }
         curValue = options[index].value;
         onchange && onchange(curValue);
+    }
+    /** Focus next option when navigating open select with keyboard */
+    function focusNextOption(index, dir) {
+        var i = pmod(index + dir, options.length);
+        var elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i];
+        // Must delay a frame before focusing
+        requestAnimationFrame(function () {
+            elOpt.focus();
+        });
     }
     /** Handle click events on select head */
     function onClickHead(e) {
@@ -125,11 +135,11 @@ var mithrilSelect = function mithrilSelect(vnode) {
         else if (e.keyCode === 37 || e.keyCode === 38) {
             // When select head is focused, arrow keys cycle through options.
             // Change to previous selection
-            nextOption(-1, onchange);
+            selectNextOption(-1);
         }
         else if (e.keyCode === 39 || e.keyCode === 40) {
             // Change to next selection
-            nextOption(1, onchange);
+            selectNextOption(1);
         }
     }
     /** Handle click events on select options */
@@ -170,20 +180,11 @@ var mithrilSelect = function mithrilSelect(vnode) {
         }
         else if (e.keyCode === 37 || e.keyCode === 38) {
             // Left or up keys - focus previous
-            var i = pmod(index - 1, options.length);
-            var elOpt_2 = rootElement.childNodes[1].childNodes[0].childNodes[i];
-            // Must delay a frame before focusing
-            requestAnimationFrame(function () {
-                elOpt_2.focus();
-            });
+            focusNextOption(index, -1);
         }
         else if (e.keyCode === 39 || e.keyCode === 40) {
             // Right or down keys - focus next
-            var i = pmod(index + 1, options.length);
-            var elOpt_3 = rootElement.childNodes[1].childNodes[0].childNodes[i];
-            requestAnimationFrame(function () {
-                elOpt_3.focus();
-            });
+            focusNextOption(index, 1);
         }
     }
     // Return object with component hooks
