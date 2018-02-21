@@ -219,9 +219,6 @@ var mithrilSelect = function mithrilSelect(vnode) {
                     curValue = options[0].value;
                 }
             }
-            if (attrs.class === 'sport-select') {
-                console.log('curOpt:', curOpt);
-            }
             return m('.mithril-select', { class: attrs.class }, m('.mithril-select-head', {
                 role: 'combobox',
                 'aria-expanded': isOpen ? 'true' : 'false',
