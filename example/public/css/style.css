@@ -61,3 +61,22 @@ body, td, th {
 	max-height: 10em;
 	overflow-y: auto;
 }
+
+/**********************************************************
+ * Editable list styles
+ */
+.editable-list {
+	display: inline-block;
+	margin-right: 1em;
+	padding: 0.5em;
+	border: 1px #BBB solid;
+}
+
+.editable-list .add-item {
+	margin: 0.25em 0;
+}
+
+.edit-instruct {
+	font-weight: bold;
+	margin: 0.5em 0;
+}

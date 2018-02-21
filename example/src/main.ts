@@ -1,5 +1,6 @@
 import * as m from 'mithril'
 import mSelect from '../../src'
+import editableList from './editable-list'
 
 /* Simple plain text options */
 const countries = [
@@ -64,6 +65,12 @@ const nativeOpts = [
 	{id: '4', text: 'purposes'}
 ]
 
+const animals = [
+	{id: 'bird', text: 'Bird'},
+	{id: 'cat', text: 'Cat'},
+	{id: 'dog', text: 'Dog'}
+]
+
 // State of each select
 let country = ''
 let colour = colours[0].text
@@ -75,14 +82,14 @@ let native = ''
 // Demo component
 const demoComponent = {
 	view() {
-		return [
+		return m('.demo',
 			m('p', 'Country: ' + country),
 			m('p', 'Colour: ' + colour),
 			m('p', 'Sport: ' + sport),
 			m('p', 'Language: ' + language),
 			m('p', 'Native select: ', native),
-			m(mSelect,
-				{
+			m('p',
+				m(mSelect, {
 					options: [
 						{value: '', view: 'Select a country...'}
 					].concat(
@@ -94,15 +101,13 @@ const demoComponent = {
 							? countries.find(c => c.id === val)!.text
 							: ''
 					}
-				}
-			),
-			// Example label for colour select
-			m('label',
-				{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
-				'Colour:'
-			),
-			m(mSelect,
-				{
+				}),
+				// Example label for colour select
+				m('label',
+					{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
+					'Colour:'
+				),
+				m(mSelect, {
 					options: colours.map(c => ({value: c.id, view: c.text})),
 					id: 'colour-select',
 					name: 'colour',  // Uses name
@@ -113,10 +118,8 @@ const demoComponent = {
 						colourId = val
 						colour = colours.find(c => c.id === colourId)!.text
 					}
-				}
-			),
-			m(mSelect,
-				{
+				}),
+				m(mSelect, {
 					// This select displays a prompt until an option is selected.
 					promptView: () => [
 						m('img.sport-image', {src: 'img/question.png'}),
@@ -134,10 +137,8 @@ const demoComponent = {
 					onchange: (val: number) => {
 						sport = sports.find(c => c.id === val)!.text
 					}
-				}
-			),
-			m(mSelect,
-				{
+				}),
+				m(mSelect, {
 					options: languages.map(l => ({value: l.id, view: l.text})),
 					// This select uses a custom style for down arrow in head
 					class: 'lang-select',
@@ -146,21 +147,35 @@ const demoComponent = {
 							? languages.find(c => c.id === val)!.text
 							: ''
 					}
-				}
-			),
-			m('select',
-				{
-					onchange: m.withAttr('value', (val: string) => {
-						native = val !== '' ?
-							nativeOpts.find(n => n.id === val)!.text
-							: ''
-					})
-				},
-				nativeOpts.map(o =>
-					m('option', {value: o.id}, o.text)
+				}),
+				m('select',
+					{
+						onchange: m.withAttr('value', (val: string) => {
+							native = val !== '' ?
+								nativeOpts.find(n => n.id === val)!.text
+								: ''
+						})
+					},
+					nativeOpts.map(o =>
+						m('option', {value: o.id}, o.text)
+					)
 				)
+			),
+			m('p',
+				m('.edit-instruct', 'Add or remove animals:'),
+				m(editableList, {
+					items: animals
+				}),
+				m(mSelect, {
+					class: 'lang-select',
+					options: [
+						{value: '', view: 'Select Animal...'}
+					].concat(
+						animals.map(a => ({value: a.id, view: a.text}))
+					)
+				})
 			)
-		]
+		)
 	}
 }
 
