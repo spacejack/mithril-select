@@ -64,104 +64,103 @@ const nativeOpts = [
 	{id: '4', text: 'purposes'}
 ]
 
-/** Demo component */
-const demoComponent: m.FactoryComponent = function() {
-	let country = ''
-	let colour = colours[0].text
-	let colourId = colours[0].id
-	let sport = ''
-	let language = ''
-	let native = ''
+// State of each select
+let country = ''
+let colour = colours[0].text
+let colourId = colours[0].id
+let sport = ''
+let language = ''
+let native = ''
 
-	return {
-		view() {
-			return [
-				m('p', 'Country: ' + country),
-				m('p', 'Colour: ' + colour),
-				m('p', 'Sport: ' + sport),
-				m('p', 'Language: ' + language),
-				m('p', 'Native select: ', native),
-				m(mSelect,
-					{
-						options: [
-							{value: '', view: 'Select a country...'}
-						].concat(
-							countries.map(c => ({value: c.id, view: c.text}))
-						),
-						class: 'demo-select',
-						onchange: (val: string) => {
-							country = !!val
-								? countries.find(c => c.id === val)!.text
-								: ''
-						}
+// Demo component
+const demoComponent = {
+	view() {
+		return [
+			m('p', 'Country: ' + country),
+			m('p', 'Colour: ' + colour),
+			m('p', 'Sport: ' + sport),
+			m('p', 'Language: ' + language),
+			m('p', 'Native select: ', native),
+			m(mSelect,
+				{
+					options: [
+						{value: '', view: 'Select a country...'}
+					].concat(
+						countries.map(c => ({value: c.id, view: c.text}))
+					),
+					class: 'demo-select',
+					onchange: (val: string) => {
+						country = !!val
+							? countries.find(c => c.id === val)!.text
+							: ''
 					}
-				),
-				// Example label for colour select
-				m('label',
-					{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
-					'Colour:'
-				),
-				m(mSelect,
-					{
-						options: colours.map(c => ({value: c.id, view: c.text})),
-						id: 'colour-select',
-						name: 'colour',  // Uses name
-						value: colourId, // and value like a regular select element
-						class: 'demo-select',
-						labelId: 'colour-label',
-						onchange: (val: string) => {
-							colourId = val
-							colour = colours.find(c => c.id === colourId)!.text
-						}
+				}
+			),
+			// Example label for colour select
+			m('label',
+				{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
+				'Colour:'
+			),
+			m(mSelect,
+				{
+					options: colours.map(c => ({value: c.id, view: c.text})),
+					id: 'colour-select',
+					name: 'colour',  // Uses name
+					value: colourId, // and value like a regular select element
+					class: 'demo-select',
+					labelId: 'colour-label',
+					onchange: (val: string) => {
+						colourId = val
+						colour = colours.find(c => c.id === colourId)!.text
 					}
-				),
-				m(mSelect,
-					{
-						// This select displays a prompt until an option is selected.
-						promptView: () => [
-							m('img.sport-image', {src: 'img/question.png'}),
-							m('span.sport-text', 'Sport')
-						],
-						// This select's options are rendered views containing images for options
-						options: sports.map(s => ({
-							value: s.id,
-							view: () => [
-								m('img.sport-image', {src: s.image}),
-								m('span.sport-text', s.text)
-							]
-						})),
-						class: 'sport-select',
-						onchange: (val: number) => {
-							sport = sports.find(c => c.id === val)!.text
-						}
+				}
+			),
+			m(mSelect,
+				{
+					// This select displays a prompt until an option is selected.
+					promptView: () => [
+						m('img.sport-image', {src: 'img/question.png'}),
+						m('span.sport-text', 'Sport')
+					],
+					// This select's options are rendered views containing images for options
+					options: sports.map(s => ({
+						value: s.id,
+						view: () => [
+							m('img.sport-image', {src: s.image}),
+							m('span.sport-text', s.text)
+						]
+					})),
+					class: 'sport-select',
+					onchange: (val: number) => {
+						sport = sports.find(c => c.id === val)!.text
 					}
-				),
-				m(mSelect,
-					{
-						options: languages.map(l => ({value: l.id, view: l.text})),
-						// This select uses a custom style for down arrow in head
-						class: 'lang-select',
-						onchange: (val: string) => {
-							language = val != null
-								? languages.find(c => c.id === val)!.text
-								: ''
-						}
+				}
+			),
+			m(mSelect,
+				{
+					options: languages.map(l => ({value: l.id, view: l.text})),
+					// This select uses a custom style for down arrow in head
+					class: 'lang-select',
+					onchange: (val: string) => {
+						language = val != null
+							? languages.find(c => c.id === val)!.text
+							: ''
 					}
-				),
-				m('select',
-					{
-						onchange: m.withAttr('value', (val: string) => {
-							native = val !== '' ?
-								nativeOpts.find(n => n.id === val)!.text
-								: ''
-						})
-					},
-					nativeOpts.map(o =>
-						m('option', {value: o.id}, o.text)
-					)
+				}
+			),
+			m('select',
+				{
+					onchange: m.withAttr('value', (val: string) => {
+						native = val !== '' ?
+							nativeOpts.find(n => n.id === val)!.text
+							: ''
+					})
+				},
+				nativeOpts.map(o =>
+					m('option', {value: o.id}, o.text)
 				)
-			]
-		}
+			)
+		]
 	}
 }
 
