@@ -161,6 +161,7 @@ const demoComponent = {
 					)
 				)
 			),
+			// Example with options that can be changed
 			m('p',
 				m('.edit-instruct', 'Add or remove animals:'),
 				m(editableList, {
