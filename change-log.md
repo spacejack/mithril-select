@@ -1,5 +1,12 @@
 # Change log
 
+## v0.4.0
+
+* Deprecated `attrs.promptContent`, `attrs.promptAttrs`, `attrs.options.content` and `attrs.options.attrs`.
+* Added `attrs.promptView` and `attrs.options.view` to replace old content. `view` is either a render function that returns vnodes, or a string primitve.
+* Refactored implementation for clarity and optimization.
+* Updated docs and examples.
+
 ## v0.3.0
 
 * Deprecated `defaultValue` attr, replaced by `initialValue`. (`defaultValue` is still supported.)
