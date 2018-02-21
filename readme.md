@@ -35,14 +35,14 @@ import mithrilSelect from "mithril-select"
 // var mithrilSelect = require("mithril-select").default
 
 // Options for the select
-const colourOptions = [
-  {value: null, content: "Select a colour..."},
-  {value: "red", content: "Red"},
-  {value: "blue", content: "Blue"},
-  {value: "green", content: "Green"},
-  {value: "yellow", content: "Yellow"},
-  {value: "orange", content: "Orange"},
-  {value: "pink", content: "Pink"}
+const colours = [
+  {value: null, text: "Select a colour..."},
+  {value: "red", text: "Red"},
+  {value: "blue", text: "Blue"},
+  {value: "green", text: "Green"},
+  {value: "yellow", text: "Yellow"},
+  {value: "orange", text: "Orange"},
+  {value: "pink", text: "Pink"}
 ]
 
 let colour = ""
@@ -50,13 +50,13 @@ let colour = ""
 const component = {
   view() {
     return m(mithrilSelect, {
-      options: colourOptions,
+      options: colours.map(c => ({value: c.value, view: c.text})),
       // A CSS class to add to the root element of the select
       class: 'my-select',
       // Respond to selection changes
       onchange: (val) => {
         colour = val != null
-          ? colourOptions.find(c => c.value === val)!.content
+          ? colourOptions.find(c => c.value === val).text
           : ""
       }
     })
@@ -72,31 +72,60 @@ const component = {
 ```typescript
 /** Represents a single option in a select */
 interface Option {
-  /** Unique value that identifies this option. Can be any type except `undefined`. */
+  /**
+   * Unique value that identifies this option.
+   * Can be any type except `undefined`.
+   */
   value: any
-  /** Instead of `content` a `view` callback can be supplied to render vnode(s). */
+  /**
+   * Either a string to display for the option or a callback
+   * that renders vnodes.
+   */
   view?: string | (() => m.Children)
 }
 
 /** Attrs object for Select component */
 interface Attrs {
-  /** Array of `Option` objects */
+  /**
+   * Array of `Option` objects
+   */
   options: Option[]
-  /** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
+  /**
+   * Optional prompt to display until the user selects an option.
+   * Supply either a string to display or a callback that renders vnodes.
+   */
   promptView?: string | (() => m.Children)
-  /** Optional value to use for element id attribute. */
+  /**
+   * Optional value to use for element id attribute.
+   */
   id?: string
-  /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */
+  /**
+   * Optional name of hidden input for form. If none supplied, no hidden
+   * input will be rendered. Hidden input value will be coerced to string.
+   */
   name?: string
-  /** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
+  /**
+   * Current selected option value. Omitting or setting to `undefined`
+   * is the same as supplying no value. (`null` can be a value.)
+   */
   value?: any
-  /** Optional label id to use for aria-labelledby attribute. */
+  /**
+   * Optional label id to use for aria-labelledby attribute.
+   */
   labelId?: string
-  /** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
+  /**
+   * Value of option that will be selected on creation. Overridden
+   * by `value` if supplied, otherwise will be first option.
+   */
   initialValue?: any
-  /** Additional class string to use on containing element. */
+  /**
+   * Additional class string to use on containing element.
+   */
   class?: string
-  /** Callback that will be passed the value of the selected option when selection changes. */
+  /**
+   * Callback that will be passed the value of the selected option
+   * when selection changes.
+   */
   onchange?(value: any): void
 }
 ```
