@@ -5,9 +5,9 @@ export interface Option {
 	/** Unique value that identifies this option. Can be any type except `undefined`. */
 	value: any
 	/**
+	 * @deprecated Use `view` instead.
 	 * Content to display for this option. Can be a string or component.
 	 * If neither content or view are provided then the value property will be used for display.
-	 * Types other than string are deprecated. Use view instead of vnodes or components here.
 	 */
 	content?: string | m.ComponentTypes<any, any>
 	/**
@@ -15,8 +15,8 @@ export interface Option {
 	 * If content is a mithril component, this attrs object will be supplied to it.
 	 */
 	attrs?: any
-	/** Instead of `content` a `view` callback can be supplied to render vnode(s). */
-	view?(): m.Children
+	/** Either a string to display for the option or a callback that renders vnodes. */
+	view?: string | (() => m.Children)
 }
 
 /** Attrs object for mithril-select component */
@@ -24,9 +24,8 @@ export interface Attrs {
 	/** Array of `Option` objects */
 	options: Option[]
 	/**
+	 * @deprecated Use `view` instead.
 	 * Optional prompt content to display until user selects an option.
-	 * If this is omitted, the first option content will be displayed.
-	 * Types other than string are deprecated. Use promptView instead of vnodes or components here.
 	 */
 	promptContent?: string | m.Vnode<any,any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>
 	/**
@@ -34,8 +33,11 @@ export interface Attrs {
 	 * If promptContent is a mithril component, this attrs object will be supplied to it.
 	 */
 	promptAttrs?: any
-	/** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
-	promptView?(): m.Children
+	/**
+	 * Optional prompt to display until the user selects an option.
+	 * Supply either a string to display or a callback that renders vnodes.
+	 */
+	promptView?: string | (() => m.Children)
 	/** Optional value to use for element id attribute. */
 	id?: string
 	/**
@@ -71,9 +73,9 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 
 	// Create a scope for some initialization so these temp vars don't hang around.
 	;(function init() {
-		const {defaultValue, value, promptContent, promptView} = vnode.attrs
+		const {defaultValue, value, promptView, promptContent} = vnode.attrs
 		let initialValue = vnode.attrs.initialValue
-		if (!promptContent && !promptView && options && options.length > 0) {
+		if (!promptView && !promptContent && options && options.length > 0) {
 			curValue = options[0].value
 		}
 		if (defaultValue !== undefined && initialValue === undefined) {
@@ -273,10 +275,14 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			let curOpt = findOption(options, curValue)
 			if (!curOpt) {
 				curValue = undefined
-				if (options.length > 0 && !attrs.promptContent) {
+				if (options.length > 0 && !attrs.promptView && !attrs.promptContent) {
 					curOpt = options[0]
 					curValue = options[0].value
 				}
+			}
+
+			if (attrs.class === 'sport-select') {
+				console.log('curOpt:', curOpt)
 			}
 
 			return m('.mithril-select', {class: attrs.class},
@@ -293,11 +299,11 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						onkeydown: onKeydownHead
 					},
 					!!curOpt
-						? curOpt.view
-							? curOpt.view()
+						? curOpt.view != null
+							? typeof curOpt.view === 'string' ? curOpt.view : curOpt.view()
 							: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-						: attrs.promptView
-							? attrs.promptView()
+						: attrs.promptView != null
+							? typeof attrs.promptView === 'string' ? attrs.promptView : attrs.promptView()
 							: renderContent(attrs.promptContent, attrs.promptAttrs)
 				),
 				m('.mithril-select-body',
@@ -318,8 +324,8 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 									onclick: onClickOption,
 									onkeydown: onKeydownOption
 								},
-								o.view
-									? o.view()
+								o.view != null
+									? typeof o.view === 'string' ? o.view : o.view()
 									: renderContent(o.content, o.attrs)
 							)
 						)

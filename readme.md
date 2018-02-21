@@ -74,26 +74,16 @@ const component = {
 interface Option {
   /** Unique value that identifies this option. Can be any type except `undefined`. */
   value: any
-  /**
-   * String content to display for this option.
-   * If neither content or view are provided then the value property will be used for display.
-   */
-  content?: string
   /** Instead of `content` a `view` callback can be supplied to render vnode(s). */
-  view?(): m.Children
+  view?: string | (() => m.Children)
 }
 
 /** Attrs object for Select component */
 interface Attrs {
   /** Array of `Option` objects */
   options: Option[]
-  /**
-   * Optional prompt content string to display until user selects an option.
-   * If this is omitted, the first option content will be displayed.
-   */
-  promptContent?: string
   /** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
-  promptView?(): m.Children
+  promptView?: string | (() => m.Children)
   /** Optional value to use for element id attribute. */
   id?: string
   /** Optional name of hidden input for form. If none supplied, no hidden input will be rendered. Hidden input value will be coerced to string. */

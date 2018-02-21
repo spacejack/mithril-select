@@ -5,9 +5,9 @@ export interface Option {
     /** Unique value that identifies this option. Can be any type except `undefined`. */
     value: any;
     /**
+     * @deprecated Use `view` instead.
      * Content to display for this option. Can be a string or component.
      * If neither content or view are provided then the value property will be used for display.
-     * Types other than string are deprecated. Use view instead of vnodes or components here.
      */
     content?: string | m.ComponentTypes<any, any>;
     /**
@@ -15,17 +15,16 @@ export interface Option {
      * If content is a mithril component, this attrs object will be supplied to it.
      */
     attrs?: any;
-    /** Instead of `content` a `view` callback can be supplied to render vnode(s). */
-    view?(): m.Children;
+    /** Either a string to display for the option or a callback that renders vnodes. */
+    view?: string | (() => m.Children);
 }
 /** Attrs object for mithril-select component */
 export interface Attrs {
     /** Array of `Option` objects */
     options: Option[];
     /**
+     * @deprecated Use `view` instead.
      * Optional prompt content to display until user selects an option.
-     * If this is omitted, the first option content will be displayed.
-     * Types other than string are deprecated. Use promptView instead of vnodes or components here.
      */
     promptContent?: string | m.Vnode<any, any> | m.Vnode<any, any>[] | m.ComponentTypes<any, any>;
     /**
@@ -33,8 +32,11 @@ export interface Attrs {
      * If promptContent is a mithril component, this attrs object will be supplied to it.
      */
     promptAttrs?: any;
-    /** Instead of `promptContent` a `promptView` callback can be supplied to render vnode(s). */
-    promptView?(): m.Children;
+    /**
+     * Optional prompt to display until the user selects an option.
+     * Supply either a string to display or a callback that renders vnodes.
+     */
+    promptView?: string | (() => m.Children);
     /** Optional value to use for element id attribute. */
     id?: string;
     /**

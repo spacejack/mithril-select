@@ -13,9 +13,9 @@ var mithrilSelect = function mithrilSelect(vnode) {
     var onchange = vnode.attrs.onchange;
     var uid = generateUid();
     (function init() {
-        var _a = vnode.attrs, defaultValue = _a.defaultValue, value = _a.value, promptContent = _a.promptContent, promptView = _a.promptView;
+        var _a = vnode.attrs, defaultValue = _a.defaultValue, value = _a.value, promptView = _a.promptView, promptContent = _a.promptContent;
         var initialValue = vnode.attrs.initialValue;
-        if (!promptContent && !promptView && options && options.length > 0) {
+        if (!promptView && !promptContent && options && options.length > 0) {
             curValue = options[0].value;
         }
         if (defaultValue !== undefined && initialValue === undefined) {
@@ -214,10 +214,13 @@ var mithrilSelect = function mithrilSelect(vnode) {
             var curOpt = findOption(options, curValue);
             if (!curOpt) {
                 curValue = undefined;
-                if (options.length > 0 && !attrs.promptContent) {
+                if (options.length > 0 && !attrs.promptView && !attrs.promptContent) {
                     curOpt = options[0];
                     curValue = options[0].value;
                 }
+            }
+            if (attrs.class === 'sport-select') {
+                console.log('curOpt:', curOpt);
             }
             return m('.mithril-select', { class: attrs.class }, m('.mithril-select-head', {
                 role: 'combobox',
@@ -230,11 +233,11 @@ var mithrilSelect = function mithrilSelect(vnode) {
                 onclick: onClickHead,
                 onkeydown: onKeydownHead
             }, !!curOpt
-                ? curOpt.view
-                    ? curOpt.view()
+                ? curOpt.view != null
+                    ? typeof curOpt.view === 'string' ? curOpt.view : curOpt.view()
                     : renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-                : attrs.promptView
-                    ? attrs.promptView()
+                : attrs.promptView != null
+                    ? typeof attrs.promptView === 'string' ? attrs.promptView : attrs.promptView()
                     : renderContent(attrs.promptContent, attrs.promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
                 role: 'listbox',
                 'aria-hidden': isOpen ? 'true' : 'false',
@@ -247,8 +250,8 @@ var mithrilSelect = function mithrilSelect(vnode) {
                     'data-index': String(index),
                     onclick: onClickOption,
                     onkeydown: onKeydownOption
-                }, o.view
-                    ? o.view()
+                }, o.view != null
+                    ? typeof o.view === 'string' ? o.view : o.view()
                     : renderContent(o.content, o.attrs));
             }))), !!name && m('input', { name: name, type: 'hidden', value: curValue }));
         }
