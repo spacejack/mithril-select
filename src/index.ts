@@ -159,7 +159,11 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		let index = 0
 		if (curValue !== undefined) {
 			index = findOptionIndex(options, curValue)
-			index = (index >= 0) ? pmod(index + dir, options.length) : 0
+			// If going past start/end, no change
+			if ((index < 1 && dir < 0) || (index >= options.length - 1 && dir > 0)) {
+				return
+			}
+			index += dir
 		}
 		curValue = options[index].value
 		onchange && onchange(curValue)
@@ -167,7 +171,11 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 
 	/** Focus next option when navigating open select with keyboard */
 	function focusNextOption (index: number, dir: 1 | -1) {
-		const i = pmod(index + dir, options.length)
+		if ((index === 0 && dir < 0) || (index >= options.length - 1 && dir > 0)) {
+			// Bail out if going past either end of the list
+			return
+		}
+		const i = index + dir
 		const elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i] as HTMLElement
 		// Must delay a frame before focusing
 		requestAnimationFrame(() => {
@@ -346,11 +354,6 @@ function renderContent (
 		return m(content as m.ComponentTypes<any, any>, attrs)
 	}
 	return content
-}
-
-/** Always positive modulus */
-function pmod (n: number, d: number) {
-	return ((n % d + d) % d)
 }
 
 /** Generate an ID for aria */
