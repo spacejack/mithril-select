@@ -34,15 +34,14 @@ See the `example` in the git repository for examples of style customization.
 import mithrilSelect from "mithril-select"
 // var mithrilSelect = require("mithril-select").default
 
-// Options for the select
+// Data to be used in select
 const colours = [
-  {value: null, text: "Select a colour..."},
-  {value: "red", text: "Red"},
-  {value: "blue", text: "Blue"},
-  {value: "green", text: "Green"},
-  {value: "yellow", text: "Yellow"},
-  {value: "orange", text: "Orange"},
-  {value: "pink", text: "Pink"}
+  {id: 'red', text: 'Red'},
+  {id: 'blue', text: 'Blue'},
+  {id: 'green', text: 'Green'},
+  {id: 'yellow', text: 'Yellow'},
+  {id: 'orange', text: 'Orange'},
+  {id: 'pink', text: 'Pink'}
 ]
 
 let colour = ""
@@ -50,13 +49,17 @@ let colour = ""
 const component = {
   view() {
     return m(mithrilSelect, {
-      options: colours.map(c => ({value: c.value, view: c.text})),
+      options: [
+        {value: null, view: 'Select a colour...'}
+      ].concat(
+        colours.map(c => ({value: c.id, view: c.text}))
+      ),
       // A CSS class to add to the root element of the select
       class: 'my-select',
       // Respond to selection changes
       onchange: (val) => {
         colour = val != null
-          ? colourOptions.find(c => c.value === val).text
+          ? colours.find(c => c.id === val).text
           : ""
       }
     })

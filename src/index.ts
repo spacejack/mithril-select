@@ -281,10 +281,6 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 				}
 			}
 
-			if (attrs.class === 'sport-select') {
-				console.log('curOpt:', curOpt)
-			}
-
 			return m('.mithril-select', {class: attrs.class},
 				m('.mithril-select-head',
 					{
