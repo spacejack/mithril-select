@@ -112,10 +112,10 @@ interface Attrs {
    * is the same as supplying no value. (`null` can be a value.)
    */
   value?: any
-  /**
-   * Optional label id to use for aria-labelledby attribute.
+	/**
+   * Optional aria-labelledby attribute
    */
-  labelId?: string
+	ariaLabelledby?: string
   /**
    * Value of option that will be selected on creation. Overridden
    * by `value` if supplied, otherwise will be first option.

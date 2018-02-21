@@ -46,7 +46,9 @@ export interface Attrs {
     name?: string;
     /** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
     value?: any;
-    /** Optional label id to use for aria-labelledby attribute. */
+    /** Optional aria-labelledby attribute */
+    ariaLabelledby?: string;
+    /** @deprecated Use ariaLabelledBy instead. Optional label id to use for aria-labelledby attribute. */
     labelId?: string;
     /** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
     initialValue?: any;

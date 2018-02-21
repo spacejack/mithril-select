@@ -47,7 +47,9 @@ export interface Attrs {
 	name?: string
 	/** Current selected option value. Omitting or setting to `undefined` is the same as supplying no value. (`null` can be a value.) */
 	value?: any
-	/** Optional label id to use for aria-labelledby attribute. */
+	/** Optional aria-labelledby attribute */
+	ariaLabelledby?: string
+	/** @deprecated Use ariaLabelledBy instead. Optional label id to use for aria-labelledby attribute. */
 	labelId?: string
 	/** Value of option that will be selected on creation. Overridden by `value` if supplied, otherwise will be first option. */
 	initialValue?: any
@@ -96,6 +98,9 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			} else {
 				console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
 			}
+		}
+		if (vnode.attrs.labelId) {
+			console.warn('mithril-select: labelId is deprecated. Use ariaLabelledby instead.')
 		}
 		// Destroy reference to our initial vnode
 		vnode = undefined as any
@@ -296,7 +301,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						'aria-expanded': isOpen ? 'true' : 'false',
 						'aria-haspopup': 'true',
 						'aria-owns': uid,
-						'aria-labelledby': attrs.labelId,
+						'aria-labelledby': attrs.ariaLabelledby || attrs.labelId,
 						id: attrs.id,
 						tabIndex: '0',
 						onclick: onClickHead,
@@ -335,7 +340,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 						)
 					)
 				),
-				!!name && m('input', {name, type: 'hidden', value: curValue})
+				!!attrs.name && m('input', {name: attrs.name, type: 'hidden', value: curValue})
 			)
 		}
 	}

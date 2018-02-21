@@ -3,7 +3,9 @@
 ## v0.4.0
 
 * Deprecated `attrs.promptContent`, `attrs.promptAttrs`, `attrs.options.content` and `attrs.options.attrs`.
-* Added `attrs.promptView` and `attrs.options.view` to replace old content. `view` is either a render function that returns vnodes, or a string primitve.
+* Added `attrs.promptView` and `attrs.options.view` to replace old content attrs. `view` is either a string primitve or a render function that returns vnodes.
+* Deprecated `attrs.labelId`
+* Added `attrs.ariaLabelledby` to replace `labelId` attr.
 * Refactored implementation for clarity and optimization.
 * Updated docs and examples.
 

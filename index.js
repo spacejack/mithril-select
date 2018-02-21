@@ -39,6 +39,9 @@ var mithrilSelect = function mithrilSelect(vnode) {
                 console.warn("mithril-select: initialValue (" + initialValue + ") does not exist in supplied options.");
             }
         }
+        if (vnode.attrs.labelId) {
+            console.warn('mithril-select: labelId is deprecated. Use ariaLabelledby instead.');
+        }
         // Destroy reference to our initial vnode
         vnode = undefined;
     }());
@@ -97,14 +100,22 @@ var mithrilSelect = function mithrilSelect(vnode) {
         var index = 0;
         if (curValue !== undefined) {
             index = findOptionIndex(options, curValue);
-            index = (index >= 0) ? pmod(index + dir, options.length) : 0;
+            // If going past start/end, no change
+            if ((index < 1 && dir < 0) || (index >= options.length - 1 && dir > 0)) {
+                return;
+            }
+            index += dir;
         }
         curValue = options[index].value;
         onchange && onchange(curValue);
     }
     /** Focus next option when navigating open select with keyboard */
     function focusNextOption(index, dir) {
-        var i = pmod(index + dir, options.length);
+        if ((index === 0 && dir < 0) || (index >= options.length - 1 && dir > 0)) {
+            // Bail out if going past either end of the list
+            return;
+        }
+        var i = index + dir;
         var elOpt = rootElement.childNodes[1].childNodes[0].childNodes[i];
         // Must delay a frame before focusing
         requestAnimationFrame(function () {
@@ -224,7 +235,7 @@ var mithrilSelect = function mithrilSelect(vnode) {
                 'aria-expanded': isOpen ? 'true' : 'false',
                 'aria-haspopup': 'true',
                 'aria-owns': uid,
-                'aria-labelledby': attrs.labelId,
+                'aria-labelledby': attrs.ariaLabelledby || attrs.labelId,
                 id: attrs.id,
                 tabIndex: '0',
                 onclick: onClickHead,
@@ -250,7 +261,7 @@ var mithrilSelect = function mithrilSelect(vnode) {
                 }, o.view != null
                     ? typeof o.view === 'string' ? o.view : o.view()
                     : renderContent(o.content, o.attrs));
-            }))), !!name && m('input', { name: name, type: 'hidden', value: curValue }));
+            }))), !!attrs.name && m('input', { name: attrs.name, type: 'hidden', value: curValue }));
         }
     };
 };
@@ -263,10 +274,6 @@ function renderContent(content, attrs) {
         return m(content, attrs);
     }
     return content;
-}
-/** Always positive modulus */
-function pmod(n, d) {
-    return ((n % d + d) % d);
 }
 /** Generate an ID for aria */
 function generateUid() {

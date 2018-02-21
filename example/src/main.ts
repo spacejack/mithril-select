@@ -108,7 +108,7 @@ const demoComponent = {
 					name: 'colour',  // Uses name
 					value: colourId, // and value like a regular select element
 					class: 'demo-select',
-					labelId: 'colour-label',
+					ariaLabelledby: 'colour-label',
 					onchange: (val: string) => {
 						colourId = val
 						colour = colours.find(c => c.id === colourId)!.text
