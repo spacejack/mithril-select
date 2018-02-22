@@ -3,18 +3,24 @@ body, td, th {
 	font-size: 15px;
 }
 
-/* Class applied to custom select - in addition to its own internal styles */
-.app-select {
+/**********************************************************
+ * Demo select
+ * Styles added to or override .mithril-select
+ */
+.demo-select {
 	margin-right: 1em;
 }
 
-/* Sport select */
+/**********************************************************
+ * Sport select
+ */
 .sport-select {
 	margin-right: 1em;
 }
 
 /* add some padding */
-.sport-select .mithril-select-head, .sport-select .mithril-select-option {
+.sport-select .mithril-select-head,
+.sport-select .mithril-select-option {
 	padding: 0.2em 0.4em;
 }
 
@@ -27,17 +33,20 @@ body, td, th {
 }
 
 .sport-select .sport-text {
-	font-family: Impact,sans-serif;
+	font-family: Impact, sans-serif;
 	font-size: 1.5em;
 }
 
-/* Language select */
+/**********************************************************
+ * Language select
+ */
 .lang-select {
 	margin-right: 1em;
 }
 
 /* Use some padding */
-.lang-select .mithril-select-head, .lang-select .mithril-select-option {
+.lang-select .mithril-select-head,
+.lang-select .mithril-select-option {
 	padding: 0.125em 0.25em;
 }
 
@@ -51,4 +60,23 @@ body, td, th {
 .lang-select .mithril-select-options {
 	max-height: 10em;
 	overflow-y: auto;
+}
+
+/**********************************************************
+ * Editable list styles
+ */
+.editable-list {
+	display: inline-block;
+	margin-right: 1em;
+	padding: 0.5em;
+	border: 1px #BBB solid;
+}
+
+.editable-list .add-item {
+	margin: 0.25em 0;
+}
+
+.edit-instruct {
+	font-weight: bold;
+	margin: 0.5em 0;
 }
