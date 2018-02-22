@@ -8,6 +8,8 @@ Try a [live demo here](https://spacejack.github.io/mithril-select/).
 
     npm install mithril-select
 
+(TypeScript types are included.)
+
 You will need to include the css file for some basic working styles.
 
 Using PostCSS with [postcss-import](https://github.com/postcss/postcss-import) allows you to import the stylesheet from `node_modules`:
