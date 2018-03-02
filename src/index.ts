@@ -58,7 +58,7 @@ export interface Attrs {
 	/** Additional class string to use on containing element. */
 	class?: string
 	/** Callback that will be passed the value of the selected option when selection changes. */
-	onchange?(value: any): void
+	onchange?(value: any): boolean | void
 }
 
 /**
@@ -69,14 +69,13 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 	let isOpen = false
 	let isFocused = false
 	let rootElement: HTMLElement
-	let options = vnode.attrs.options
-	let onchange = vnode.attrs.onchange
+	let attrs = vnode.attrs
 	const uid = generateUid()
 
 	// Create a scope for some initialization so these temp vars don't hang around.
 	;(function init() {
-		const {defaultValue, value, promptView, promptContent} = vnode.attrs
-		let initialValue = vnode.attrs.initialValue
+		const {defaultValue, value, promptView, promptContent, options} = attrs
+		let initialValue = attrs.initialValue
 		if (!promptView && !promptContent && options && options.length > 0) {
 			curValue = options[0].value
 		}
@@ -140,6 +139,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 
 	function open () {
 		isOpen = true
+		const options = attrs.options
 		// When the component is opened, the idea is to focus
 		// either the currently selected option or the first one
 		// (like a native browser select.)
@@ -152,14 +152,17 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 				elOpt.focus()
 			})
 		}
+		render()
 	}
 
 	function close() {
 		isOpen = false
+		render()
 	}
 
 	/** Select next option in closed select with keyboard */
 	function selectNextOption (dir: 1 | -1) {
+		const options = attrs.options
 		if (!options || options.length < 1) return
 		let index = 0
 		if (curValue !== undefined) {
@@ -171,12 +174,16 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			index += dir
 		}
 		curValue = options[index].value
-		onchange && onchange(curValue)
+		let doRedraw = true
+		if (attrs.onchange && attrs.onchange(curValue) === false) {
+			doRedraw = false
+		}
+		if (doRedraw) m.redraw()
 	}
 
 	/** Focus next option when navigating open select with keyboard */
 	function focusNextOption (index: number, dir: 1 | -1) {
-		if ((index === 0 && dir < 0) || (index >= options.length - 1 && dir > 0)) {
+		if ((index === 0 && dir < 0) || (index >= attrs.options.length - 1 && dir > 0)) {
 			// Bail out if going past either end of the list
 			return
 		}
@@ -196,7 +203,7 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 	}
 
 	/** Handle keydown events on select head */
-	function onKeydownHead (e: KeyboardEvent) {
+	function onKeydownHead (e: KeyboardEvent & {redraw?: false}) {
 		if (e.keyCode === 32) {
 			e.preventDefault()
 			toggle()
@@ -221,7 +228,9 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 	/** Handle click events on select options */
 	function onClickOption (e: Event) {
 		e.stopPropagation()
-		const opt = options[Number((e.currentTarget as HTMLElement).getAttribute('data-index'))]
+		const opt = attrs.options[
+			Number((e.currentTarget as HTMLElement).getAttribute('data-index'))
+		]
 		curValue = opt.value
 		isFocused = false
 		close()
@@ -229,13 +238,18 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		requestAnimationFrame(() => {
 			(rootElement.childNodes[0] as HTMLElement).focus()
 		})
-		onchange && onchange(opt.value)
+		let doRedraw = true
+		if (attrs.onchange && attrs.onchange(opt.value) === false) {
+			doRedraw = false
+		}
+		if (doRedraw) m.redraw()
 	}
 
 	/** Handle keydown events on select options */
 	function onKeydownOption (e: KeyboardEvent) {
 		const index = Number((e.currentTarget as HTMLElement).getAttribute('data-index'))
-		const opt = options[index]
+		const opt = attrs.options[index]
+		let doRedraw = true
 		if (e.keyCode === 13) {
 			// Enter selects
 			curValue = opt.value
@@ -245,7 +259,9 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			requestAnimationFrame(() => {
 				(rootElement.childNodes[0] as HTMLElement).focus()
 			})
-			onchange && onchange(opt.value)
+			if (attrs.onchange && attrs.onchange(opt.value) === false) {
+				doRedraw = false
+			}
 		} else if (e.keyCode === 27) {
 			// Escape closes
 			close()
@@ -260,88 +276,98 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			// Right or down keys - focus next
 			focusNextOption(index, 1)
 		}
+		if (doRedraw) m.redraw()
+	}
+
+	function render() {
+		const options = attrs.options
+		if (attrs.value !== undefined) {
+			curValue = attrs.value
+		}
+		let curOpt = findOption(options, curValue)
+		if (!curOpt) {
+			curValue = undefined
+			if (options.length > 0 && !attrs.promptView && !attrs.promptContent) {
+				curOpt = options[0]
+				curValue = options[0].value
+			}
+		}
+		m.render(rootElement, [
+			m('.mithril-select-head',
+				{
+					role: 'combobox',
+					'aria-expanded': isOpen ? 'true' : 'false',
+					'aria-haspopup': 'true',
+					'aria-owns': uid,
+					'aria-labelledby': attrs.ariaLabelledby || attrs.labelId,
+					id: attrs.id,
+					tabIndex: '0',
+					onclick: onClickHead,
+					onkeydown: onKeydownHead
+				},
+				!!curOpt
+					? curOpt.view != null
+						? typeof curOpt.view === 'string' ? curOpt.view : curOpt.view()
+						: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
+					: attrs.promptView != null
+						? typeof attrs.promptView === 'string' ? attrs.promptView : attrs.promptView()
+						: renderContent(attrs.promptContent, attrs.promptAttrs)
+			),
+			m('.mithril-select-body',
+				{class: isOpen ? 'mithril-select-body-open' : undefined},
+				m('ul.mithril-select-options',
+					{
+						role: 'listbox',
+						'aria-hidden': isOpen ? 'true' : 'false',
+						id: uid
+					},
+					options.map((o, index) =>
+						m('li.mithril-select-option',
+							{
+								key: index,
+								tabIndex: '-1',
+								'aria-role': 'option',
+								'data-index': String(index),
+								onclick: onClickOption,
+								onkeydown: onKeydownOption
+							},
+							o.view != null
+								? typeof o.view === 'string' ? o.view : o.view()
+								: renderContent(o.content, o.attrs)
+						)
+					)
+				)
+			),
+			!!attrs.name && m('input', {
+				type: 'hidden', name: attrs.name, value: curValue
+			})
+		])
 	}
 
 	// Return object with component hooks
 	return {
-		oncreate ({dom}) {
-			window.addEventListener('focus', onFocus, true)
-			window.addEventListener('blur', onBlur, true)
-			rootElement = dom as HTMLElement
+		oncreate (vnode) { // tslint:disable-line no-shadowed-variable
+			rootElement = vnode.dom as HTMLElement
+			rootElement.addEventListener('focus', onFocus, true)
+			rootElement.addEventListener('blur', onBlur, true)
+			attrs = vnode.attrs
+			render()
 		},
 
-		onupdate ({dom}) {
-			rootElement = dom as HTMLElement
+		onupdate (vnode) { // tslint:disable-line no-shadowed-variable
+			//rootElement = vnode.dom as HTMLElement
+			attrs = vnode.attrs
+			render()
 		},
 
 		onremove() {
-			window.removeEventListener('focus', onFocus, true)
-			window.removeEventListener('blur', onBlur, true)
+			rootElement.removeEventListener('focus', onFocus, true)
+			rootElement.removeEventListener('blur', onBlur, true)
 		},
 
-		view ({attrs}) {
-			options = attrs.options
-			onchange = attrs.onchange
-			if (attrs.value !== undefined) {
-				curValue = attrs.value
-			}
-			let curOpt = findOption(options, curValue)
-			if (!curOpt) {
-				curValue = undefined
-				if (options.length > 0 && !attrs.promptView && !attrs.promptContent) {
-					curOpt = options[0]
-					curValue = options[0].value
-				}
-			}
-
-			return m('.mithril-select', {class: attrs.class},
-				m('.mithril-select-head',
-					{
-						role: 'combobox',
-						'aria-expanded': isOpen ? 'true' : 'false',
-						'aria-haspopup': 'true',
-						'aria-owns': uid,
-						'aria-labelledby': attrs.ariaLabelledby || attrs.labelId,
-						id: attrs.id,
-						tabIndex: '0',
-						onclick: onClickHead,
-						onkeydown: onKeydownHead
-					},
-					!!curOpt
-						? curOpt.view != null
-							? typeof curOpt.view === 'string' ? curOpt.view : curOpt.view()
-							: renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
-						: attrs.promptView != null
-							? typeof attrs.promptView === 'string' ? attrs.promptView : attrs.promptView()
-							: renderContent(attrs.promptContent, attrs.promptAttrs)
-				),
-				m('.mithril-select-body',
-					{class: isOpen ? 'mithril-select-body-open' : undefined},
-					m('ul.mithril-select-options',
-						{
-							role: 'listbox',
-							'aria-hidden': isOpen ? 'true' : 'false',
-							id: uid
-						},
-						options.map((o, index) =>
-							m('li.mithril-select-option',
-								{
-									key: index,
-									tabIndex: '-1',
-									'aria-role': 'option',
-									'data-index': String(index),
-									onclick: onClickOption,
-									onkeydown: onKeydownOption
-								},
-								o.view != null
-									? typeof o.view === 'string' ? o.view : o.view()
-									: renderContent(o.content, o.attrs)
-							)
-						)
-					)
-				),
-				!!attrs.name && m('input', {name: attrs.name, type: 'hidden', value: curValue})
-			)
+		view (vnode) { // tslint:disable-line no-shadowed-variable
+			attrs = vnode.attrs
+			return m('.mithril-select', {class: vnode.attrs.class})
 		}
 	}
 }

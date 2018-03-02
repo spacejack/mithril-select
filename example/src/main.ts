@@ -181,3 +181,11 @@ const demoComponent = {
 }
 
 m.mount(document.getElementById('select-demo')!, demoComponent)
+
+m.render(
+	document.getElementById('select-render-demo')!,
+	m(mSelect, {
+		options: languages.map(l => ({value: l.id, view: l.text})),
+		class: 'lang-select'
+	})
+)
