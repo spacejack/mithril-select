@@ -1,8 +1,9 @@
 {
-  "extends": ["tslint-microsoft-contrib"],
+  "extends": ["tslint:recommended"],
   "defaultSeverity": "warn",
   "rules": {
     "align": [false],
+    "array-type": false,
     "curly": false,
     "export-name": false,
     "function-name": false,
@@ -12,6 +13,7 @@
     "interface-name": false,
     "jsdoc-format": false,
     "max-func-body-length": false,
+    "max-line-length": false,
     "member-access": false,
     "member-ordering": false,
     "missing-jsdoc": false,
@@ -34,6 +36,8 @@
     "no-unused-expression": false,
     "no-unused-variable": true,
     "number-literal-format": false,
+    "object-literal-key-quotes": false,
+    "object-literal-sort-keys": false,
     "one-variable-per-declaration": false,
     "ordered-imports": [false],
     "prefer-array-literal": false,
@@ -43,6 +47,8 @@
     "prefer-type-cast": false,
     "quotemark": false,
     "semicolon": [true, "never"],
+    "space-before-function-paren": false,
+    "trailing-comma": false,
     "typedef": [false],
     "use-named-parameter": false,
     "whitespace": [

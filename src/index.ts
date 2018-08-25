@@ -1,4 +1,4 @@
-import * as m from 'mithril'
+import m from 'mithril'
 
 /** Represents a single option in a mithril-select */
 export interface Option {
@@ -64,47 +64,14 @@ export interface Attrs {
 /**
  * mithril-select Component
  */
-const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) { // tslint:disable-line no-shadowed-variable
+export default function MithrilSelect(): m.Component<Attrs> {
 	let curValue: any
 	let isOpen = false
 	let isFocused = false
 	let rootElement: HTMLElement
-	let options = vnode.attrs.options
-	let onchange = vnode.attrs.onchange
+	let options: Option[] = []
+	let onchange: ((value: any) => void) | undefined
 	const uid = generateUid()
-
-	// Create a scope for some initialization so these temp vars don't hang around.
-	;(function init() {
-		const {defaultValue, value, promptView, promptContent} = vnode.attrs
-		let initialValue = vnode.attrs.initialValue
-		if (!promptView && !promptContent && options && options.length > 0) {
-			curValue = options[0].value
-		}
-		if (defaultValue !== undefined && initialValue === undefined) {
-			console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.')
-			initialValue = defaultValue
-		}
-		if (value !== undefined) {
-			// If a `value` attr was supplied it overrides/is used as initialValue
-			if (findOption(options, value)) {
-				initialValue = value
-			} else {
-				console.warn(`mithril-select: value (${value}) does not exist in supplied options.`)
-			}
-		}
-		if (initialValue !== undefined) {
-			if (findOption(options, initialValue)) {
-				curValue = initialValue
-			} else {
-				console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
-			}
-		}
-		if (vnode.attrs.labelId) {
-			console.warn('mithril-select: labelId is deprecated. Use ariaLabelledby instead.')
-		}
-		// Destroy reference to our initial vnode
-		vnode = undefined as any
-	}())
 
 	/** Handle event when child element is focused */
 	function onFocus (e: FocusEvent) {
@@ -255,15 +222,49 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 			})
 		} else if (e.keyCode === 37 || e.keyCode === 38) {
 			// Left or up keys - focus previous
+			e.preventDefault()
 			focusNextOption(index, -1)
 		} else if (e.keyCode === 39 || e.keyCode === 40) {
 			// Right or down keys - focus next
+			e.preventDefault()
 			focusNextOption(index, 1)
 		}
 	}
 
 	// Return object with component hooks
 	return {
+		oninit(vnode) {
+			const {defaultValue, value, promptView, promptContent} = vnode.attrs
+			options = vnode.attrs.options
+			onchange = vnode.attrs.onchange
+			let initialValue = vnode.attrs.initialValue
+			if (!promptView && !promptContent && options && options.length > 0) {
+				curValue = options[0].value
+			}
+			if (defaultValue !== undefined && initialValue === undefined) {
+				console.warn('mithril-select: defaultValue is deprecated. Use initialValue instead.')
+				initialValue = defaultValue
+			}
+			if (value !== undefined) {
+				// If a `value` attr was supplied it overrides/is used as initialValue
+				if (findOption(options, value)) {
+					initialValue = value
+				} else {
+					console.warn(`mithril-select: value (${value}) does not exist in supplied options.`)
+				}
+			}
+			if (initialValue !== undefined) {
+				if (findOption(options, initialValue)) {
+					curValue = initialValue
+				} else {
+					console.warn(`mithril-select: initialValue (${initialValue}) does not exist in supplied options.`)
+				}
+			}
+			if (vnode.attrs.labelId) {
+				console.warn('mithril-select: labelId is deprecated. Use ariaLabelledby instead.')
+			}
+		},
+
 		oncreate ({dom}) {
 			window.addEventListener('focus', onFocus, true)
 			window.addEventListener('blur', onBlur, true)
@@ -345,8 +346,6 @@ const mithrilSelect: m.FactoryComponent<Attrs> = function mithrilSelect (vnode) 
 		}
 	}
 }
-
-export default mithrilSelect
 
 /** Render content of the head or an option */
 function renderContent (

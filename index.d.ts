@@ -62,5 +62,4 @@ export interface Attrs {
 /**
  * mithril-select Component
  */
-declare const mithrilSelect: m.FactoryComponent<Attrs>;
-export default mithrilSelect;
+export default function MithrilSelect(): m.Component<Attrs>;

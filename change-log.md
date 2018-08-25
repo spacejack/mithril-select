@@ -1,5 +1,13 @@
 # Change log
 
+## v0.5.0
+
+* Use `event.preventDefault()` on arrow keypresses to prevent undesirable scrolling.
+* Use `esModuleInterop` in tsconfig for cleaner import statements.
+* Cleaner component init.
+* Remove Microsoft tslint rules, use `tslint:recommended`.
+* Other minor code style cleanups.
+
 ## v0.4.0
 
 * Deprecated `attrs.promptContent`, `attrs.promptAttrs`, `attrs.options.content` and `attrs.options.attrs`.

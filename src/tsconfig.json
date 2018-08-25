@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "esModuleInterop": true,
     "lib": ["dom", "es2015"],
     "strict": true,
     "noUnusedLocals": true,
@@ -11,10 +12,6 @@
     "outDir": ".."
   },
   "files": ["index.ts"],
-  "exclude": ["node_modules", "../node_modules"],
   "compileOnSave": false,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  }
+  "buildOnSave": false
 }

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "esModuleInterop": true,
     "lib": ["es2015", "dom"],
     "strict": true,
     "noUnusedLocals": true,
@@ -9,8 +10,5 @@
   },
   "files": ["main.ts"],
   "compileOnSave": false,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  }
+  "buildOnSave": false
 }

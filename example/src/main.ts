@@ -1,6 +1,6 @@
-import * as m from 'mithril'
-import mSelect from '../../src'
-import editableList from './editable-list'
+import m from 'mithril'
+import MSelect from '../../src'
+import EditableList from './editable-list'
 
 /* Simple plain text options */
 const countries = [
@@ -89,7 +89,7 @@ const demoComponent = {
 			m('p', 'Language: ' + language),
 			m('p', 'Native select: ', native),
 			m('p',
-				m(mSelect, {
+				m(MSelect, {
 					options: [
 						{value: '', view: 'Select a country...'}
 					].concat(
@@ -107,7 +107,7 @@ const demoComponent = {
 					{id: 'colour-label', for: 'colour-select', style: {marginRight: '0.25em'}},
 					'Colour:'
 				),
-				m(mSelect, {
+				m(MSelect, {
 					options: colours.map(c => ({value: c.id, view: c.text})),
 					id: 'colour-select',
 					name: 'colour',  // Uses name
@@ -119,7 +119,7 @@ const demoComponent = {
 						colour = colours.find(c => c.id === colourId)!.text
 					}
 				}),
-				m(mSelect, {
+				m(MSelect, {
 					// This select displays a prompt until an option is selected.
 					promptView: () => [
 						m('img.sport-image', {src: 'img/question.png'}),
@@ -138,7 +138,7 @@ const demoComponent = {
 						sport = sports.find(c => c.id === val)!.text
 					}
 				}),
-				m(mSelect, {
+				m(MSelect, {
 					options: languages.map(l => ({value: l.id, view: l.text})),
 					// This select uses a custom style for down arrow in head
 					class: 'lang-select',
@@ -164,10 +164,10 @@ const demoComponent = {
 			// Example with options that can be changed
 			m('p',
 				m('.edit-instruct', 'Add or remove animals:'),
-				m(editableList, {
+				m(EditableList, {
 					items: animals
 				}),
-				m(mSelect, {
+				m(MSelect, {
 					class: 'lang-select',
 					options: [
 						{value: '', view: 'Select Animal...'}
