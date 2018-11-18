@@ -1,4 +1,3 @@
-/// <reference types="mithril" />
 import * as m from 'mithril';
 /** Represents a single option in a mithril-select */
 export interface Option {

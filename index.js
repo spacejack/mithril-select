@@ -1,9 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var mithril_1 = __importDefault(require("mithril"));
+var m = require("mithril");
 /**
  * mithril-select Component
  */
@@ -32,7 +29,7 @@ function MithrilSelect() {
             requestAnimationFrame(function () {
                 if (isOpen && !isFocused) {
                     close();
-                    mithril_1.default.redraw();
+                    m.redraw();
                 }
             });
         }
@@ -235,7 +232,7 @@ function MithrilSelect() {
                     curValue = options[0].value;
                 }
             }
-            return mithril_1.default('.mithril-select', { class: attrs.class }, mithril_1.default('.mithril-select-head', {
+            return m('.mithril-select', { class: attrs.class }, m('.mithril-select-head', {
                 role: 'combobox',
                 'aria-expanded': isOpen ? 'true' : 'false',
                 'aria-haspopup': 'true',
@@ -251,12 +248,12 @@ function MithrilSelect() {
                     : renderContent(curOpt.content != null ? curOpt.content : curOpt.value, curOpt.attrs)
                 : attrs.promptView != null
                     ? typeof attrs.promptView === 'string' ? attrs.promptView : attrs.promptView()
-                    : renderContent(attrs.promptContent, attrs.promptAttrs)), mithril_1.default('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, mithril_1.default('ul.mithril-select-options', {
+                    : renderContent(attrs.promptContent, attrs.promptAttrs)), m('.mithril-select-body', { class: isOpen ? 'mithril-select-body-open' : undefined }, m('ul.mithril-select-options', {
                 role: 'listbox',
                 'aria-hidden': isOpen ? 'true' : 'false',
                 id: uid
             }, options.map(function (o, index) {
-                return mithril_1.default('li.mithril-select-option', {
+                return m('li.mithril-select-option', {
                     key: index,
                     tabIndex: '-1',
                     'aria-role': 'option',
@@ -266,7 +263,7 @@ function MithrilSelect() {
                 }, o.view != null
                     ? typeof o.view === 'string' ? o.view : o.view()
                     : renderContent(o.content, o.attrs));
-            }))), !!attrs.name && mithril_1.default('input', { name: attrs.name, type: 'hidden', value: curValue }));
+            }))), !!attrs.name && m('input', { name: attrs.name, type: 'hidden', value: curValue }));
         }
     };
 }
@@ -276,7 +273,7 @@ function renderContent(content, attrs) {
     // What type is content...
     if (content && (typeof content === 'function' || typeof content.view === 'function')) {
         // Assume component - render vnode
-        return mithril_1.default(content, attrs);
+        return m(content, attrs);
     }
     return content;
 }

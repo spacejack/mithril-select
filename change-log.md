@@ -1,5 +1,9 @@
 # Change log
 
+## v0.5.1
+
+* Updated packages, clean up configs.
+
 ## v0.5.0
 
 * Use `event.preventDefault()` on arrow keypresses to prevent undesirable scrolling.
